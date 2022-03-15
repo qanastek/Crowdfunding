@@ -7,10 +7,11 @@ import pandas as pd
 
 from sklearn import preprocessing
 from sklearn.utils import shuffle
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 class Dataset:
 
-    def __init__(self, path, shuffle=True, seed=0, verbose=True, save_gzip_path=None, clean_gzip=False, train_ratio=0.90):
+    def __init__(self, path, shuffle=True, seed=0, verbose=True, save_gzip_path=None, clean_gzip=False, train_ratio=0.90, normalizer="StandardScaler"):
         """
         Constructor for the dataset
         """
@@ -18,6 +19,9 @@ class Dataset:
         # Shuffle
         self.shuffle = shuffle
         self.seed = seed
+
+        # Normalizer
+        self.normalizer = normalizer
 
         # Verbose
         self.verbose = verbose
@@ -41,7 +45,7 @@ class Dataset:
         # Define regex parse for date
         self.dateparse = lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S')
 
-        self.numeric_features = ["age", "goal"]
+        self.numeric_features = ["age", "goal", "elapsed_days"]
         self.categorical_features = ["category", "subcategory", "country", "sex", "currency"]
 
         # Load the corpora
@@ -67,6 +71,14 @@ class Dataset:
         # Drop useless columns
         sub_df = sub_df.drop(['id', 'name', 'pledged', 'backers', 'state', 'start_date', 'end_date'], axis=1)
         print("> Drop columns - DONE!")
+
+        if self.normalizer == "MinMaxScaler":
+            scaler = MinMaxScaler()
+        elif self.normalizer == "StandardScaler":
+            scaler = StandardScaler()
+
+        if self.normalizer != None and scaler != None:
+            sub_df[self.numeric_features] = scaler.fit_transform(sub_df[self.numeric_features])
 
         # Transform to numpy array
         X = sub_df.to_numpy()
