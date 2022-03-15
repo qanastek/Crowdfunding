@@ -1,5 +1,8 @@
 from typing import List
 
+import pandas as pd
+from pandas import DataFrame
+
 class Dataset:
 
     def __init__(self, path):
@@ -19,5 +22,13 @@ class Dataset:
         self.__load(path)
     
     def __load(self, path, cache=False):
-        print("Please implement the loading function for the dataset!")
-        raise NotImplementedError
+        print('> Load from raw dataset...')
+        # df:DataFrame = pd.read_csv(path, encoding='utf-8', na_values=[None,])
+        df:DataFrame = pd.read_csv(path, encoding='cp1252', na_values=[None])
+
+        print()
+        print(df.info())
+        print()
+        print(df.describe().transpose())
+        print()
+        print(df.select_dtypes(object).describe().transpose())
