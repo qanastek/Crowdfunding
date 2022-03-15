@@ -6,10 +6,13 @@
 
 - Encoding is 'cp1252'.
 - Missing values are simply 'None'.
-- Some missing/null values in columns:
-  - name
-  - country
-  - sex
+- Missing Values
+  - name (count: 4)
+  - country (count: 3797)
+  - sex (count: 8908)
+- Outliers
+  - start_date (count: , reason: Unix epoch default date value)
+    - See <https://en.wikipedia.org/wiki/Unix_time>
 - String columns do not benefit from standardization.
   - upper()
   - strip()
