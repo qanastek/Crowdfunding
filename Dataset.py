@@ -34,7 +34,8 @@ class Dataset:
         self.y_test = None
 
         # Labels
-        self.labels = "data/labels.npy"
+        self.labels = None
+        self.labels_path = "data/labels.npy"
         self.label_encoder = preprocessing.LabelEncoder()
 
         # Define regex parse for date
@@ -52,7 +53,9 @@ class Dataset:
         if mode == "train":
             print(">>> TRAIN <<<")
             Y = self.label_encoder.fit_transform(sub_df.state.to_list())
-            np.save(self.labels, self.label_encoder.classes_)
+            np.save(self.labels_path, self.label_encoder.classes_)
+            self.labels = list(self.label_encoder.classes_)
+            print("Labels : ", self.labels)
         else:
             print(">>> TEST <<<")
             Y = self.label_encoder.transform(sub_df.state.to_list())
