@@ -1,29 +1,29 @@
 from typing import List
+from os.path import exists
 from datetime import datetime
-from collections import Counter
 
 import numpy as np
 import pandas as pd
 
 from sklearn import preprocessing
-from sklearn.compose import ColumnTransformer
-from sklearn.datasets import fetch_openml
-from sklearn.pipeline import Pipeline
-from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split, GridSearchCV
-
-import pandas as pd
-from pandas import DataFrame
-from sklearn.feature_extraction.text import strip_accents_unicode
+from sklearn.utils import shuffle
 
 class Dataset:
 
-    def __init__(self, path):
+    def __init__(self, path, shuffle=True, seed=0, verbose=True, save_gzip_path=None, clean_gzip=False, train_ratio=0.90):
+        """
+        Constructor for the dataset
+        """
+
+        # Shuffle
+        self.shuffle = shuffle
+        self.seed = seed
+
+        # Verbose
+        self.verbose = verbose
 
         # Ratios
-        self.train_ratio = 0.90
+        self.train_ratio = train_ratio
 
         # Train set
         self.x_train = None
@@ -45,9 +45,12 @@ class Dataset:
         self.categorical_features = ["category", "subcategory", "country", "sex", "currency"]
 
         # Load the corpora
-        self.__load(path)
+        self.__load(path, save_gzip_path=save_gzip_path, clean_gzip=clean_gzip)
     
     def __transform(self, sub_df: pd.DataFrame, mode="train"):
+        """
+        Apply a transformation of the input and references data to be compatible with Scikit-Learn
+        """
 
         # Get labels
         if mode == "train":
@@ -61,19 +64,9 @@ class Dataset:
             Y = self.label_encoder.transform(sub_df.state.to_list())
         print("> label_encoder.fit_transform - DONE!")
 
-        # Get elapsed time in days
-        sub_df['elapsed_days'] = sub_df.apply(lambda row: (row.end_date - row.start_date).days, axis=1)
-        print("> Add elapsed_days - DONE!")
-
         # Drop useless columns
         sub_df = sub_df.drop(['id', 'name', 'pledged', 'backers', 'state', 'start_date', 'end_date'], axis=1)
         print("> Drop columns - DONE!")
-
-        # Transform to categorial
-        for c in self.categorical_features:
-            sub_df[c] = sub_df[c].astype('category')
-        sub_df = pd.get_dummies(sub_df, columns=self.categorical_features, prefix=self.categorical_features).head()
-        print("> To categorial - DONE!")
 
         # Transform to numpy array
         X = sub_df.to_numpy()
@@ -81,19 +74,50 @@ class Dataset:
 
         return X, Y
 
-    def __load(self, path, cache=False):
+    def __load(self, path, save_gzip_path=None, clean_gzip=False):
+        """
+        Load CSV files and apply pre-processing
+        """
 
-        # Read original CSV file
-        df: pd.DataFrame = pd.read_csv(path, encoding='Windows-1252', na_values=[None], parse_dates=['start_date','end_date'], date_parser=self.dateparse)
-        print("> DataFrame read - DONE!")
+        # Search for compressed & preprocessed data files
+        if save_gzip_path != None and exists(save_gzip_path+'.npz') and not clean_gzip:
 
-        # Get train index
-        train_idx = int(len(df)*self.train_ratio)
+            loaded = np.load(save_gzip_path + '.npz')
+            self.x_train, self.y_train = loaded['x_train'], loaded['y_train']
+            self.x_test, self.y_test   = loaded['x_test'], loaded['y_test']
+            print("> Data loaded - DONE!")
 
-        # Split into train and test
-        df_train = df.iloc[:train_idx, :]
-        df_test  = df.iloc[train_idx:, :]
+        else:
 
-        # Transform sub-dataframes
-        self.x_train, self.y_train = self.__transform(df_train, mode="train")
-        self.x_test, self.y_test   = self.__transform(df_test, mode="test")
+            # Read original CSV file
+            df: pd.DataFrame = pd.read_csv(path, encoding='Windows-1252', na_values=[None], parse_dates=['start_date','end_date'], date_parser=self.dateparse)
+            print("> DataFrame read - DONE!")
+
+            # Get elapsed time in days
+            df['elapsed_days'] = df.apply(lambda row: (row.end_date - row.start_date).days, axis=1)
+            print("> Add elapsed_days - DONE!")
+
+            # Transform to categorial
+            for c in self.categorical_features:
+                df[c] = df[c].astype('category')
+            df = pd.get_dummies(df, columns=self.categorical_features, prefix=self.categorical_features)
+
+            # Shuffle the data with reproducible results
+            if self.shuffle:
+                df = shuffle(df, random_state=self.seed)
+                print("> Shuffle - DONE!")
+
+            # Get train index
+            train_idx = int(len(df)*self.train_ratio)
+
+            # Split into train and test
+            df_train = df.iloc[:train_idx, :]
+            df_test  = df.iloc[train_idx:, :]
+
+            # Transform sub-dataframes
+            self.x_train, self.y_train = self.__transform(df_train, mode="train")
+            self.x_test, self.y_test   = self.__transform(df_test, mode="test")
+            
+            # Save sub-dataframes
+            if save_gzip_path != None:
+                np.savez_compressed(save_gzip_path, x_train=self.x_train, y_train=self.y_train, x_test=self.x_test , y_test=self.x_test )

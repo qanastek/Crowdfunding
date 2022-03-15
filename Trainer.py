@@ -8,8 +8,8 @@ class Trainer:
     Basic trainer for sklearn models
     """
 
-    def __init__(self, path):
-        self.ds = Dataset(path)
+    def __init__(self, path, shuffle=True, seed=0, save_gzip_path=None, clean_gzip=False):
+        self.ds = Dataset(path, shuffle=shuffle, seed=seed, save_gzip_path=save_gzip_path, clean_gzip=clean_gzip)
         self.model = None
 
     @abstractmethod
@@ -23,5 +23,5 @@ class Trainer:
 
     def evaluate(self):
         preds = self.predict()
-        f1_score = classification_report(self.ds.y_test, preds, target_names=self.ds.labels)
+        f1_score = classification_report(self.ds.y_test, preds, target_names=self.ds.labels, zero_division=1)
         return f1_score
