@@ -5,22 +5,21 @@ from collections import Counter
 import numpy as np
 import pandas as pd
 
+from os.path import exists
+from pandas import DataFrame
 from sklearn import preprocessing
-from sklearn.compose import ColumnTransformer
-from sklearn.datasets import fetch_openml
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.datasets import fetch_openml
+from sklearn.compose import ColumnTransformer
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split, GridSearchCV
-
-import pandas as pd
-from pandas import DataFrame
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.feature_extraction.text import strip_accents_unicode
+from sklearn.model_selection import train_test_split, GridSearchCV
 
 class Dataset:
 
-    def __init__(self, path):
+    def __init__(self, path, save_gzip_path=None):
 
         # Ratios
         self.train_ratio = 0.90
@@ -81,19 +80,30 @@ class Dataset:
 
         return X, Y
 
-    def __load(self, path, cache=False):
+    def __load(self, path, save_gzip_path=None):
 
-        # Read original CSV file
-        df: pd.DataFrame = pd.read_csv(path, encoding='Windows-1252', na_values=[None], parse_dates=['start_date','end_date'], date_parser=self.dateparse)
-        print("> DataFrame read - DONE!")
+        # Search for compressed & preprocessed data files
+        if  save_gzip_path != None and exists(save_gzip_path+'.npz') :
+            loaded = np.load(save_gzip_path+'.npz')
+            self.x_train, self.y_train = loaded['x_train'], loaded['y_train']
+            self.x_test, self.y_test   = loaded['x_test'], loaded['y_test']
 
-        # Get train index
-        train_idx = int(len(df)*self.train_ratio)
+        else : # Read original CSV file
+            
+            df: pd.DataFrame = pd.read_csv(path, encoding='Windows-1252', na_values=[None], parse_dates=['start_date','end_date'], date_parser=self.dateparse)
+            print("> DataFrame read - DONE!")
 
-        # Split into train and test
-        df_train = df.iloc[:train_idx, :]
-        df_test  = df.iloc[train_idx:, :]
+            # Get train index
+            train_idx = int(len(df)*self.train_ratio)
 
-        # Transform sub-dataframes
-        self.x_train, self.y_train = self.__transform(df_train, mode="train")
-        self.x_test, self.y_test   = self.__transform(df_test, mode="test")
+            # Split into train and test
+            df_train = df.iloc[:train_idx, :]
+            df_test  = df.iloc[train_idx:, :]
+
+            # Transform sub-dataframes
+            self.x_train, self.y_train = self.__transform(df_train, mode="train")
+            self.x_test, self.y_test   = self.__transform(df_test, mode="test")
+
+            # Save sub-dataframes
+            if save_gzip_path != None:
+                np.savez_compressed(save_gzip_path, x_train=self.x_train, y_train=self.y_train, x_test=self.x_test , y_test=self.x_test )

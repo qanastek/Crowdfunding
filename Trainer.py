@@ -8,8 +8,8 @@ class Trainer:
     Basic trainer for sklearn models
     """
 
-    def __init__(self, path):
-        self.ds = Dataset(path)
+    def __init__(self, path, save_gzip_path=None):
+        self.ds = Dataset(path, save_gzip_path=save_gzip_path)
         self.model = None
 
     @abstractmethod
