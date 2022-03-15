@@ -30,5 +30,6 @@
   - end_date (unique: 274233)
   - currency (unique: 10)
   - state (unique: 6)
+- Nominal vs Ordinal?
 
 ## Processing

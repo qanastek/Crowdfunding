@@ -3,3 +3,4 @@ seaborn
 tables
 tqdm
 sklearn
+requests
