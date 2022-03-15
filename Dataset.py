@@ -19,7 +19,7 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 
 class Dataset:
 
-    def __init__(self, path, save_gzip_path=None):
+    def __init__(self, path, save_gzip_path=None, clean_gzip=False):
 
         # Ratios
         self.train_ratio = 0.90
@@ -44,7 +44,7 @@ class Dataset:
         self.categorical_features = ["category", "subcategory", "country", "sex", "currency"]
 
         # Load the corpora
-        self.__load(path, save_gzip_path=save_gzip_path)
+        self.__load(path, save_gzip_path=save_gzip_path, clean_gzip=clean_gzip)
     
     def __transform(self, sub_df: pd.DataFrame, mode="train"):
 
@@ -71,7 +71,7 @@ class Dataset:
         # Transform to categorial
         for c in self.categorical_features:
             sub_df[c] = sub_df[c].astype('category')
-        sub_df = pd.get_dummies(sub_df, columns=self.categorical_features, prefix=self.categorical_features).head()
+        sub_df =  pd.get_dummies(sub_df, columns=self.categorical_features, prefix=self.categorical_features)
         print("> To categorial - DONE!")
 
         # Transform to numpy array
@@ -80,13 +80,15 @@ class Dataset:
 
         return X, Y
 
-    def __load(self, path, save_gzip_path=None):
+    def __load(self, path, save_gzip_path=None, clean_gzip=False):
 
         # Search for compressed & preprocessed data files
-        if  save_gzip_path != None and exists(save_gzip_path+'.npz') :
+        if save_gzip_path != None and exists(save_gzip_path+'.npz') and not clean_gzip :
+
             loaded = np.load(save_gzip_path+'.npz')
             self.x_train, self.y_train = loaded['x_train'], loaded['y_train']
             self.x_test, self.y_test   = loaded['x_test'], loaded['y_test']
+            print("> Data loaded - DONE!")
 
         else : # Read original CSV file
 
