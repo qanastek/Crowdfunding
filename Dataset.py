@@ -14,6 +14,10 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split, GridSearchCV
 
+import pandas as pd
+from pandas import DataFrame
+from sklearn.feature_extraction.text import strip_accents_unicode
+
 class Dataset:
 
     def __init__(self, path):
