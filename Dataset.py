@@ -44,7 +44,7 @@ class Dataset:
         self.categorical_features = ["category", "subcategory", "country", "sex", "currency"]
 
         # Load the corpora
-        self.__load(path)
+        self.__load(path, save_gzip_path=save_gzip_path)
     
     def __transform(self, sub_df: pd.DataFrame, mode="train"):
 
@@ -89,7 +89,7 @@ class Dataset:
             self.x_test, self.y_test   = loaded['x_test'], loaded['y_test']
 
         else : # Read original CSV file
-            
+
             df: pd.DataFrame = pd.read_csv(path, encoding='Windows-1252', na_values=[None], parse_dates=['start_date','end_date'], date_parser=self.dateparse)
             print("> DataFrame read - DONE!")
 
