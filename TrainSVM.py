@@ -24,6 +24,9 @@ class TrainSVM(Trainer):
         print("> START TRAINING !")
         self.model = svm.fit(self.ds.x_train, self.ds.y_train)
 
+        res = self.predict()
+        print(res)
+        
         print("Score train: ", svm.score(self.ds.x_train, self.ds.y_train))
         print("Score test: ", svm.score(self.ds.x_test, self.ds.y_test))
 
