@@ -11,7 +11,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 class Dataset:
 
-    def __init__(self, path, shuffle=True, seed=0, verbose=True, save_gzip_path=None, clean_gzip=False, train_ratio=0.90, normalizer="StandardScaler"):
+    def __init__(self, path, shuffle=True, seed=0, verbose=True, save_gzip_path=None, clean_gzip=False, train_ratio=0.99, normalizer="StandardScaler"):
         """
         Constructor for the dataset
         """
@@ -132,4 +132,4 @@ class Dataset:
             
             # Save sub-dataframes
             if save_gzip_path != None:
-                np.savez_compressed(save_gzip_path, x_train=self.x_train, y_train=self.y_train, x_test=self.x_test , y_test=self.x_test )
+                np.savez_compressed(save_gzip_path, x_train=self.x_train, y_train=self.y_train, x_test=self.x_test, y_test=self.y_test)

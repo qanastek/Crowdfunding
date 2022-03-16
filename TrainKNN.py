@@ -8,15 +8,20 @@ class TrainKNN(Trainer):
         self.model = KNeighborsClassifier(n_neighbors=n_neighbors)
 
     def train(self):
-
+        print("> Training")
         self.model.fit(self.ds.x_train, self.ds.y_train)
 
-        res = self.predict()
-        print(res)
+        print("Finish fit!")
+
+        # res = self.predict()
+        # print(res)
+        # print("Finish predict!")
 
         print("Score train: ", self.model.score(self.ds.x_train, self.ds.y_train))
         print("Score test: ", self.model.score(self.ds.x_test, self.ds.y_test))
 
-s = TrainKNN("data/short.csv", save_gzip_path="data/knn-prepro")
-# s = TrainKNN("data/projects.csv", save_gzip_path="data/knn-prepro")
+# s = TrainKNN("data/short.csv", save_gzip_path="data/knn-prepro", clean_gzip=True)
+s = TrainKNN("data/projects.csv", save_gzip_path="data/knn-prepro", clean_gzip=True)
 s.train()
+f1 = s.evaluate()
+print(f1)
