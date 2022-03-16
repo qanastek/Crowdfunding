@@ -12,8 +12,8 @@ __pycache__/*
 data/*
 !data/.gitkeep
 
-figs/*
-!figs/.gitkeep
+plots/*
+!plots/.gitkeep
 
 models/*
 !models/.gitkeep

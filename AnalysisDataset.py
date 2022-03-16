@@ -1,6 +1,8 @@
 from datetime import datetime
 import os
 import requests
+import seaborn as sns
+import matplotlib.pyplot as plt
 from typing import List
 
 import pandas as pd
@@ -11,8 +13,12 @@ class AnalysisDataset:
     
     DATA_PROJECTS_FILE_CSV = "data/projects.csv"
     DATA_PROJECTS_FILE_H5 = "data/projects.h5"
+    DATA_PROJECTS_URL = 'https://filesender.renater.fr/?s=download&token=2f5ed948-6e35-4bf1-88ed-7ab5dd0411b9'
 
     def __init__(self, path):
+
+        sns.set_theme(style="whitegrid")
+        sns.color_palette("crest", as_cmap=True)
 
         # DataFrame
         self.data = None
@@ -33,6 +39,8 @@ class AnalysisDataset:
 
         # Load the corpora
         self.__load(path)
+    
+
     
     def __load(self, path, cache=False):
         # Reload previously processed dataset, if available
@@ -57,11 +65,14 @@ class AnalysisDataset:
         print('> Save compressed and processed DataFrame...')
         self.data.to_hdf(path, key='data', complevel=9)
 
+
+
     def __download_data(self, path:str):
         print("> Downloading raw CSV file...")
-        url = 'https://filesender.renater.fr/?s=download&token=2f5ed948-6e35-4bf1-88ed-7ab5dd0411b9'
-        r = requests.get(url, allow_redirects=True)
+        r = requests.get(AnalysisDataset.DATA_PROJECTS_URL, allow_redirects=True)
         open(path, 'wb').write(r.content)
+
+
 
     def print_statistics(self):
         pd.set_option('display.max_rows', None)
@@ -78,6 +89,8 @@ class AnalysisDataset:
         pd.reset_option('display.max_colwidth')
         pd.reset_option('display.float_format')
 
+
+
     def __preprocess(self):
         print('> Calculating elapsed days...')
         self.data['elapsed_days'] = self.data.apply(lambda row: (row.end_date - row.start_date).days, axis=1)
@@ -89,9 +102,78 @@ class AnalysisDataset:
         for label in labels:
             self.data[label] = self.data.loc[self.data[label].notna(), label].astype(str)
 
-        print()
         print('> Normalizing string columns...')
         for label, content in self.data.select_dtypes(object).iteritems():
             self.data[label] = self.data[label].apply(lambda x: strip_accents_unicode(str(x).upper().strip()) if not str(x) in (None, 'nan') else None)
             self.data.loc[(self.data[label] == ''), label] = None
             self.data[label].replace('\s+', ' ', regex=True, inplace=True)
+
+
+
+    def __build_numerical_boxplots(self):
+        vars = [
+            'age',
+            'goal',
+            'pledged',
+            'backers',
+            'elapsed_days',
+        ]
+        for var in vars:
+            plt.subplots()
+            # sns.boxplot(data=self.data, x=var, palette="tab10")
+            sns.boxenplot(data=self.data, x=var, palette="tab10")
+            plt.savefig('plots/num_boxenplot_{}.png'.format(var), bbox_inches='tight')
+            plt.close()
+
+
+
+    def __build_numerical_pairplot(self):
+        vars = [
+            'age',
+            'goal',
+            'pledged',
+            'backers',
+            'elapsed_days',
+        ]
+        filtered = self.data.loc[self.data["state"].isin(["SUCCESSFUL", "FAILED"])]
+
+        g = sns.PairGrid(filtered, hue="category", palette="viridis", dropna=True)
+        # g = sns.pairplot(filtered, vars=vars, hue="category", palette="viridis", plot_kws={'alpha': 0.5, 's': 100, 'edgecolor': 'k'}, dropna=True)
+        # g.map_diag(sns.kdeplot, hue=None, color="0.3")
+        g.map_diag(sns.kdeplot)
+        g.map_offdiag(sns.scatterplot, size=self.data["sex"])
+        # g._legend.remove() # Remove built-in legend from pairplot
+        g.add_legend(adjust_subtitles=True)
+        g.savefig('plots/num_pairgrid.png')
+        return
+
+
+
+    def build_plots_numerical(self):
+        self.__build_numerical_boxplots()
+        self.__build_numerical_pairplot()
+        return
+
+
+
+    def build_plots_categorial(self):
+        vars = [
+            'category',
+            'country',
+            'sex',
+            'currency',
+            'state',
+        ]
+        for var in vars:
+            plt.subplots()
+            # sns.catplot(ax=ax, data=self.data, y=var, kind="count", palette="crest")
+            sns.countplot(data=self.data, y=var, palette="crest")
+            plt.savefig('plots/cat_catplot_{}.png'.format(var), bbox_inches='tight')
+            plt.close()
+        
+        # plt.subplots()
+        # # sns.catplot(ax=ax, data=self.data, y=var, kind="count", palette="crest")
+        # sns.countplot(data=self.data, y='category', hue="state", palette="crest")
+        # plt.savefig('plots/cat_catplot_cagtegory-state.png'.format(var), bbox_inches='tight')
+        # plt.close()
+        return
