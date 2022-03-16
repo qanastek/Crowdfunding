@@ -13,7 +13,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 class Dataset:
 
-    def __init__(self, path, shuffle=True, seed=0, verbose=True, save_gzip_path=None, clean_gzip=False, train_ratio=0.99, normalizer="StandardScaler", normalize_currency=True):
+    def __init__(self, path, shuffle=True, seed=0, verbose=True, save_gzip_path=None, clean_gzip=False, train_ratio=0.60, dev_ratio=0.20, test_ratio=0.20, normalizer="StandardScaler", normalize_currency=True):
         """
         Constructor for the dataset
         """
@@ -31,10 +31,16 @@ class Dataset:
 
         # Ratios
         self.train_ratio = train_ratio
+        self.dev_ratio = dev_ratio
+        self.test_ratio = test_ratio
 
         # Train set
         self.x_train = None
         self.y_train = None
+        
+        # Dev set
+        self.x_dev = None
+        self.y_dev = None
 
         # Test set
         self.x_test = None
@@ -102,6 +108,7 @@ class Dataset:
 
             loaded = np.load(save_gzip_path + '.npz')
             self.x_train, self.y_train = loaded['x_train'], loaded['y_train']
+            self.x_dev, self.y_dev   = loaded['x_dev'], loaded['y_dev']
             self.x_test, self.y_test   = loaded['x_test'], loaded['y_test']
             print("> Data loaded - DONE!")
 
@@ -110,6 +117,11 @@ class Dataset:
             # Read original CSV file
             df: pd.DataFrame = pd.read_csv(path, encoding='Windows-1252', na_values=[None], parse_dates=['start_date','end_date'], date_parser=self.dateparse)
             print("> DataFrame read - DONE!")
+
+            # Remove useless states and merge others
+            df = df.drop(df[df.state.str.upper().isin(["LIVE", "SUSPENDED", "UNDEFINED"])].index)
+            df.state = df.state.replace("canceled", "failed")
+            print("> Remove useless states and merge others - DONE!")
 
             # Get elapsed time in days
             df['elapsed_days'] = df.apply(lambda row: (row.end_date - row.start_date).days, axis=1)
@@ -134,17 +146,39 @@ class Dataset:
                 df = shuffle(df, random_state=self.seed)
                 print("> Shuffle - DONE!")
 
-            # Get train index
-            train_idx = int(len(df)*self.train_ratio)
-
             # Split into train and test
-            df_train = df.iloc[:train_idx, :]
-            df_test  = df.iloc[train_idx:, :]
+            length = len(df)
+
+            # Index and split for train
+            train_start_idx, train_end_idx = 0, int(length*self.train_ratio)
+            df_train = df.iloc[train_start_idx:train_end_idx, :]
+
+            # Index and split for dev
+            dev_start_idx, dev_end_idx = train_end_idx, train_end_idx + int(length*self.dev_ratio)
+            df_dev  = df.iloc[dev_start_idx:dev_end_idx, :]
+
+            # Index and split for test
+            test_start_idx, test_end_idx = dev_end_idx, dev_end_idx + int(length*self.test_ratio)
+            df_test  = df.iloc[test_start_idx:test_end_idx, :]
 
             # Transform sub-dataframes
             self.x_train, self.y_train = self.__transform(df_train, mode="train")
+            self.x_dev, self.y_dev     = self.__transform(df_dev, mode="dev")
             self.x_test, self.y_test   = self.__transform(df_test, mode="test")
             
             # Save sub-dataframes
             if save_gzip_path != None:
-                np.savez_compressed(save_gzip_path, x_train=self.x_train, y_train=self.y_train, x_test=self.x_test, y_test=self.y_test)
+
+                np.savez_compressed(
+
+                    save_gzip_path,
+
+                    x_train=self.x_train,
+                    y_train=self.y_train,
+
+                    x_dev=self.x_dev,
+                    y_dev=self.y_dev,
+
+                    x_test=self.x_test,
+                    y_test=self.y_test
+                )
