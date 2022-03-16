@@ -8,7 +8,7 @@ class TrainKNN(Trainer):
         self.model = KNeighborsClassifier(n_neighbors=n_neighbors)
 
     def train(self):
-
+        print("> Training")
         self.model.fit(self.ds.x_train, self.ds.y_train)
 
         print("Finish fit!")
