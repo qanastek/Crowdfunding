@@ -9,7 +9,7 @@ class TrainKNN(Trainer):
                 clean_gzip=False,
                 num_strategy=None,
                 cat_strategy=None,
-                normalizer="StandardScaler",
+                normalizer=None,
                 normalize_currency = True):
 
         super().__init__(path,
@@ -48,6 +48,6 @@ def test():
     '''
 
 
-    s = TrainKNN("data/projects.csv", save_gzip_path="data/ds_mean_uv")
+    s = TrainKNN("data/projects.csv", num_strategy="mean", cat_strategy="unique_value", normalizer="StandardScaler", save_gzip_path="data/ds_mean_uv")
     print("Training-score : " + str(s.train()))
     print("Test F-Score : " + str(s.evaluate()))
