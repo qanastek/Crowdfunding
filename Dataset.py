@@ -88,14 +88,13 @@ class Dataset:
         """
 
         # Get labels
+        print(">>> " + mode.upper() + " <<<")
         if mode == "train":
-            print(">>> TRAIN <<<")
             Y = self.label_encoder.fit_transform(sub_df.state.to_list())
             np.save(self.labels_path, self.label_encoder.classes_)
             self.labels = list(self.label_encoder.classes_)
             print("Labels : ", self.labels)
         else:
-            print(">>> TEST <<<")
             Y = self.label_encoder.transform(sub_df.state.to_list())
         print("> label_encoder.fit_transform - DONE!")
 
