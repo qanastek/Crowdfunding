@@ -26,12 +26,10 @@ class TrainKNN(Trainer):
         print("> Training")
         self.model.fit(self.ds.x_train, self.ds.y_train)
         print("Finish fit!")
-        print("Score train: ", self.model.score(self.ds.x_train, self.ds.y_train))
-        print("Score test: ", self.model.score(self.ds.x_test, self.ds.y_test))
+        return self.model.score(self.ds.x_train, self.ds.y_train)
 
 def test():
 
     s = TrainKNN("data/projects.csv", save_gzip_path="data/ds_mean_uv")
-    s.train()
-    f1 = s.evaluate()
-    print(f1)
+    print("Training-score : " + str(s.train()))
+    print("Test F-Score : " + str(s.evaluate()))
