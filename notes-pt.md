@@ -24,9 +24,9 @@
 - Numerical Variables
   - id
   - age
-  - goal
-  - pledged
-  - backers
+  - goal (même fonctionnalité que 'pledge')
+  - pledged (hors de notre contrôle, ignore)
+  - backers (hors de notre contrôle, ignore)
 - Categorical Variables
   - name (unique: 297872)
   - category (unique: 15)
@@ -40,5 +40,10 @@
 - Nominal vs Ordinal?
 - Label Variable
   - state
+- Goal
+  - Classification binaire (Success ou Fail)
+    - Transformer les labels (state) en binaire en groupant ou supprimant les valeurs.
+      - Group 'failed' et 'canceled'
+      - Remove 'live', 'suspended' et 'undefined'
 
 ## Processing
