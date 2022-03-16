@@ -30,6 +30,24 @@ class TrainKNN(Trainer):
 
 def test():
 
+    ''' 
+    Add test() at the end of this file and run ─▶ python3 TrainKNN.py :
+    Out :
+        > Data loaded - DONE!
+        > Training
+        Finish fit!
+        Training-score : 0.78190961948805
+        Test F-Score :               precision    recall  f1-score   support
+
+                   0       0.60      0.60      0.60     21145
+                   1       0.59      0.60      0.59     20877
+
+            accuracy                           0.60     42022
+           macro avg       0.60      0.60      0.60     42022
+        weighted avg       0.60      0.60      0.60     42022 
+    '''
+
+
     s = TrainKNN("data/projects.csv", save_gzip_path="data/ds_mean_uv")
     print("Training-score : " + str(s.train()))
     print("Test F-Score : " + str(s.evaluate()))
