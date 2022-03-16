@@ -1,7 +1,7 @@
 from abc import abstractmethod
 
 from Dataset import Dataset
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, f1_score
 
 class Trainer:
     """
@@ -38,10 +38,21 @@ class Trainer:
         )
         self.model = None
 
+        # Datasets Hyper-parameters
+        self.normalizers = ["StandardScaler", "MinMaxScaler", None]
+        self.normalizers_currency = [True, False]
+        self.num_strategies = ["mean", "median", 10]
+        self.cat_strategies = ["most_frequent", "NaN_Token"]
+
     @abstractmethod
     def train(self):
         print("Please implement the train function first!")
         self.model = None
+        raise NotImplementedError
+
+    @staticmethod
+    def benchmarks():
+        print("Please implement the benchmark function!")
         raise NotImplementedError
 
     def predict(self, data):
@@ -58,5 +69,14 @@ class Trainer:
             exit(0)
 
         preds = self.predict(x)
-        f1_score = classification_report(y, preds, target_names=self.ds.labels, zero_division=1)
-        return f1_score
+        
+        f1 = f1_score(y_true=y, y_pred=preds)
+
+        f1_matrix = classification_report(
+            y,
+            preds,
+            target_names = self.ds.labels,
+            zero_division = 1
+        )
+        
+        return f1, f1_matrix

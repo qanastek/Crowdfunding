@@ -10,25 +10,34 @@ class TrainSVM(Trainer):
 
     def __init__(self, path, shuffle=True, seed=0, save_gzip_path=None, clean_gzip=False, normalizer="StandardScaler"):
         super().__init__(path, shuffle=shuffle, seed=seed, save_gzip_path=save_gzip_path, clean_gzip=clean_gzip, normalizer=normalizer)
-        self.EPOCHS = 999999999
+        self.penalities = ["l2","l1"]
 
-    def train(self):
+    def train(self, epochs=15, penalty="l2", loss="squared_hinge", dual=True):
 
-        svm = LinearSVC(
-            max_iter = 20,
-            # learning_rate = 0.01,
+        self.model = LinearSVC(
+            max_iter = epochs,
+            penalty = penalty,
+            loss = loss,
+            dual = dual,
         )
 
         print("> START TRAINING !")
-        self.model = svm.fit(self.ds.x_train, self.ds.y_train)
+        self.model.fit(self.ds.x_train, self.ds.y_train)
+        print("> TRAINING FINISHED !")
 
-        print("Score train: ", svm.score(self.ds.x_train, self.ds.y_train))
-        print("Score test: ", svm.score(self.ds.x_test, self.ds.y_test))
-
-# s = TrainSVM("data/short.csv", normalizer="StandardScaler")
-# s = TrainSVM("data/short.csv", normalizer="MinMaxScaler")
-# s = TrainSVM("data/short.csv", normalizer=None)
-s = TrainSVM("data/projects.csv", normalizer="StandardScaler")
-s.train()
-f1 = s.evaluate()
-print(f1)
+    @staticmethod
+    def benchmarks():
+        data_path = "data/StandardScaler_only"
+        return {
+            "name": "SVM",
+            "model": TrainSVM(
+                "data/projects.csv",
+                normalizer="StandardScaler",
+                save_gzip_path=data_path,
+                clean_gzip=False
+            ),
+            "args": [
+                {"epochs":15, "penalty":"l1", "loss":"squared_hinge", "dual":False},
+                {"epochs":15, "penalty":"l2", "loss":"squared_hinge", "dual":True},
+            ]
+        }

@@ -1,0 +1,26 @@
+[
+    {
+        "name": "SVM",
+        "dataset": "data/StandardScaler_only",
+        "hyper_params": {
+            "epochs": 15,
+            "penalty": "l1",
+            "loss": "squared_hinge",
+            "dual": false
+        },
+        "f1": 0.6524842745070323,
+        "f1_matrix": "              precision    recall  f1-score   support\n\n           0       0.66      0.63      0.65     21145\n           1       0.64      0.66      0.65     20877\n\n    accuracy                           0.65     42022\n   macro avg       0.65      0.65      0.65     42022\nweighted avg       0.65      0.65      0.65     42022\n"
+    },
+    {
+        "name": "SVM",
+        "dataset": "data/StandardScaler_only",
+        "hyper_params": {
+            "epochs": 15,
+            "penalty": "l2",
+            "loss": "squared_hinge",
+            "dual": true
+        },
+        "f1": 0.5455692210659098,
+        "f1_matrix": "              precision    recall  f1-score   support\n\n           0       0.59      0.79      0.68     21145\n           1       0.68      0.46      0.55     20877\n\n    accuracy                           0.62     42022\n   macro avg       0.64      0.62      0.61     42022\nweighted avg       0.64      0.62      0.61     42022\n"
+    }
+]

@@ -27,8 +27,7 @@ class Dataset:
         normalizer = "StandardScaler",
         normalize_currency = True,
         num_strategy = None,
-        cat_strategy = None,
-        default_category = "NaN_Token"
+        cat_strategy = "NaN_Token"
     ):
         """
         Constructor for the dataset
@@ -43,7 +42,6 @@ class Dataset:
         self.normalize_currency = normalize_currency
         self.num_strategy = num_strategy
         self.cat_strategy = cat_strategy
-        self.default_category = default_category
 
         # Verbose
         self.verbose = verbose
@@ -70,6 +68,10 @@ class Dataset:
         self.labels_path = "data/labels.npy"
         self.label_encoder = preprocessing.LabelEncoder()
 
+        # GZIP Caching
+        self.save_gzip_path = save_gzip_path
+        self.clean_gzip = clean_gzip
+
         # Define regex parse for date
         self.dateparse = lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S')
 
@@ -80,7 +82,7 @@ class Dataset:
         self.cc = CurrencyConverter()
 
         # Load the corpora
-        self.__load(path, save_gzip_path=save_gzip_path, clean_gzip=clean_gzip)
+        self.__load(path)
     
     def __transform(self, sub_df: pd.DataFrame, mode="train"):
         """
@@ -116,15 +118,15 @@ class Dataset:
 
         return X, Y
 
-    def __load(self, path, save_gzip_path=None, clean_gzip=False):
+    def __load(self, path):
         """
         Load CSV files and apply pre-processing
         """
 
         # Search for compressed & preprocessed data files
-        if save_gzip_path != None and exists(save_gzip_path+'.npz') and not clean_gzip:
+        if self.save_gzip_path != None and exists(self.save_gzip_path+'.npz') and not self.clean_gzip:
 
-            loaded = np.load(save_gzip_path + '.npz')
+            loaded = np.load(self.save_gzip_path + '.npz')
             self.x_train, self.y_train = loaded['x_train'], loaded['y_train']
             self.x_dev, self.y_dev   = loaded['x_dev'], loaded['y_dev']
             self.x_test, self.y_test   = loaded['x_test'], loaded['y_test']
@@ -188,8 +190,8 @@ class Dataset:
                         value = df[c].mode()[0]
                         print("> Replacing missing categorical by the most frequent value - DONE!")
 
-                    elif self.cat_strategy == "unique_value":
-                        value = self.default_category
+                    elif type(self.cat_strategy) in [str]:
+                        value = self.cat_strategy
                         print("> Replacing missing categorical by a default value - DONE!")
 
                     df[c] = df[c].fillna(value=value)
@@ -225,11 +227,11 @@ class Dataset:
             self.x_test, self.y_test   = self.__transform(df_test, mode="test")
             
             # Save sub-dataframes
-            if save_gzip_path != None:
+            if self.save_gzip_path != None:
 
                 np.savez_compressed(
 
-                    save_gzip_path,
+                    self.save_gzip_path,
 
                     x_train=self.x_train,
                     y_train=self.y_train,

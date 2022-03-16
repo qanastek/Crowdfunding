@@ -26,9 +26,6 @@ class TrainMLP(Trainer):
         print("Score train: ", m.score(self.ds.x_train, self.ds.y_train))
         print("Score test: ", m.score(self.ds.x_test, self.ds.y_test))
 
-# s = TrainMLP("data/short.csv", normalizer="StandardScaler")
-# s = TrainMLP("data/short.csv", normalizer="MinMaxScaler")
-# s = TrainMLP("data/short.csv", normalizer=None)
 s = TrainMLP("data/projects.csv", normalizer="StandardScaler")
 s.train()
 f1 = s.evaluate()
