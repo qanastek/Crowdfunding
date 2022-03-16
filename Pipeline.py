@@ -12,8 +12,9 @@ class Pipeline:
     """
 
     def __init__(self):
-        self.models : List[Trainer] = []
-        self.models.append(TrainSVM)
+        self.models : List[Trainer] = [
+            TrainSVM,
+        ]
         self.results = []
         self.dir = "benchmarks/"
         os.makedirs(self.dir, exist_ok=True)
