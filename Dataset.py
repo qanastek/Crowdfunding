@@ -13,7 +13,23 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 class Dataset:
 
-    def __init__(self, path, shuffle=True, seed=0, verbose=True, save_gzip_path=None, clean_gzip=False, train_ratio=0.60, dev_ratio=0.20, test_ratio=0.20, normalizer="StandardScaler", normalize_currency=True):
+    def __init__(
+        self,
+        path,
+        shuffle = True,
+        seed = 0,
+        verbose = True,
+        save_gzip_path = None,
+        clean_gzip = False,
+        train_ratio = 0.60,
+        dev_ratio = 0.20,
+        test_ratio = 0.20,
+        normalizer = "StandardScaler",
+        normalize_currency = True,
+        num_strategy = None,
+        cat_strategy = None,
+        default_category = "NaN_Token"
+    ):
         """
         Constructor for the dataset
         """
@@ -25,6 +41,9 @@ class Dataset:
         # Normalizer
         self.normalizer = normalizer
         self.normalize_currency = normalize_currency
+        self.num_strategy = num_strategy
+        self.cat_strategy = cat_strategy
+        self.default_category = default_category
 
         # Verbose
         self.verbose = verbose
@@ -123,9 +142,19 @@ class Dataset:
             df.state = df.state.replace("canceled", "failed")
             print("> Remove useless states and merge others - DONE!")
 
+            min_occurences = min(df.groupby(['state']).size().reset_index(drop=True))
+            df = pd.concat([
+                df[df.state.isin([col])].sample(min_occurences) for col in ["failed", "successful"]
+            ])
+            print("> Downsampling the data based on the labels - DONE!")
+            
+            print("> Labels distribution :")
+            for row in df.groupby(['state']).size():
+                print(" >", row)
+
             # Get elapsed time in days
             df['elapsed_days'] = df.apply(lambda row: (row.end_date - row.start_date).days, axis=1)
-            print("> Add elapsed_days - DONE!")
+            print("> Get elapsed time in days - DONE!")
 
             # Normalize Currency
             if self.normalize_currency:
@@ -135,6 +164,36 @@ class Dataset:
                 print("> Currencies normalized - DONE!")
             else:
                 self.categorical_features.append('currency')
+
+            # Fill missing numerical values
+            if self.num_strategy != None:
+
+                if self.num_strategy == "mean":
+                    df[self.numeric_features] = df[self.numeric_features].fillna(df.mean().round(1))
+                    print("> Replacing missing numerical by mean value - DONE!")
+
+                elif self.num_strategy == "median":
+                    df[self.numeric_features] = df[self.numeric_features].fillna(df.median().round(1))
+                    print("> Replacing missing numerical by median value - DONE!")
+
+                elif type(self.num_strategy) in [int,float]:
+                    df[self.numeric_features] = df[self.numeric_features].fillna(value=float(self.num_strategy))
+                    print("> Replacing missing numerical by a default value - DONE!")
+
+            # Fill missing categorical values
+            if self.cat_strategy != None:
+
+                for c in self.categorical_features:
+
+                    if self.cat_strategy == "most_frequent":
+                        value = df[c].mode()[0]
+                        print("> Replacing missing categorical by the most frequent value - DONE!")
+
+                    elif self.cat_strategy == "unique_value":
+                        value = self.default_category
+                        print("> Replacing missing categorical by a default value - DONE!")
+
+                    df[c] = df[c].fillna(value=value)
 
             # Transform to categorial
             for c in self.categorical_features:
