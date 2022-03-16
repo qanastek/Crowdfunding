@@ -171,7 +171,6 @@ class AnalysisDataset:
             plt.savefig('plots/cat_catplot_{}.png'.format(var), bbox_inches='tight')
             plt.close()
         
-        
         # plt.subplots()
         # # sns.catplot(ax=ax, data=self.data, y=var, kind="count", palette="crest")
         # sns.countplot(data=self.data, y='category', hue="state", palette="crest")
