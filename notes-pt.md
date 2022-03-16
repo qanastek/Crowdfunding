@@ -11,6 +11,10 @@
   - country (count: 3797)
   - sex (count: 8908)
 - Outliers
+  - age (count: , reason: Unix epoch default date value)
+  - goal (count: , reason: Unix epoch default date value)
+  - pledged (count: , reason: Unix epoch default date value)
+  - backers (count: , reason: Unix epoch default date value)
   - start_date (count: , reason: Unix epoch default date value)
     - See <https://en.wikipedia.org/wiki/Unix_time>
 - String columns do not benefit from standardization.
@@ -34,5 +38,7 @@
   - currency (unique: 10)
   - state (unique: 6)
 - Nominal vs Ordinal?
+- Label Variable
+  - state
 
 ## Processing
