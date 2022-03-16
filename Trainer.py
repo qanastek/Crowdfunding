@@ -8,8 +8,8 @@ class Trainer:
     Basic trainer for sklearn models
     """
 
-    def __init__(self, path, shuffle=True, seed=0, save_gzip_path=None, clean_gzip=False, train_ratio=0.99, normalizer="StandardScaler"):
-        self.ds = Dataset(path, shuffle=shuffle, seed=seed, save_gzip_path=save_gzip_path, clean_gzip=clean_gzip, train_ratio=train_ratio, normalizer=normalizer)
+    def __init__(self, path, shuffle=True, seed=0, save_gzip_path=None, clean_gzip=False, train_ratio=0.99, normalizer="StandardScaler", normalize_currency=True):
+        self.ds = Dataset(path, shuffle=shuffle, seed=seed, save_gzip_path=save_gzip_path, clean_gzip=clean_gzip, train_ratio=train_ratio, normalizer=normalizer, normalize_currency=normalize_currency)
         self.model = None
 
     @abstractmethod

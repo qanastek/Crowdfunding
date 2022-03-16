@@ -5,13 +5,15 @@ from datetime import datetime
 import numpy as np
 import pandas as pd
 
+from currency_converter import CurrencyConverter
+
 from sklearn import preprocessing
 from sklearn.utils import shuffle
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 class Dataset:
 
-    def __init__(self, path, shuffle=True, seed=0, verbose=True, save_gzip_path=None, clean_gzip=False, train_ratio=0.99, normalizer="StandardScaler"):
+    def __init__(self, path, shuffle=True, seed=0, verbose=True, save_gzip_path=None, clean_gzip=False, train_ratio=0.99, normalizer="StandardScaler", normalize_currency=True):
         """
         Constructor for the dataset
         """
@@ -22,6 +24,7 @@ class Dataset:
 
         # Normalizer
         self.normalizer = normalizer
+        self.normalize_currency = normalize_currency
 
         # Verbose
         self.verbose = verbose
@@ -46,7 +49,10 @@ class Dataset:
         self.dateparse = lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S')
 
         self.numeric_features = ["age", "goal", "elapsed_days"]
-        self.categorical_features = ["category", "subcategory", "country", "sex", "currency"]
+        self.categorical_features = ["category", "subcategory", "country", "sex"]
+
+        # Currency converter
+        self.cc = CurrencyConverter()
 
         # Load the corpora
         self.__load(path, save_gzip_path=save_gzip_path, clean_gzip=clean_gzip)
@@ -108,6 +114,15 @@ class Dataset:
             # Get elapsed time in days
             df['elapsed_days'] = df.apply(lambda row: (row.end_date - row.start_date).days, axis=1)
             print("> Add elapsed_days - DONE!")
+
+            # Normalize Currency
+            if self.normalize_currency:
+                # Transform to USD
+                df['goal'] = df.apply(lambda row: self.cc.convert(row.goal, row.currency, 'USD'), axis=1)
+                df = df.drop(['currency'], axis=1)
+                print("> Currencies normalized - DONE!")
+            else:
+                self.categorical_features.append('currency')
 
             # Transform to categorial
             for c in self.categorical_features:
