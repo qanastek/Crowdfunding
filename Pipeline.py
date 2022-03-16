@@ -11,14 +11,19 @@ class Pipeline:
     Run the benchmarks
     """
 
-    def __init__(self):
+    def __init__(self, dir="benchmarks/"):
+
+        # Models to run benchmarks
         self.models : List[Trainer] = [
             TrainSVM,
         ]
+
+        # List of results
         self.results = []
-        self.dir = "benchmarks/"
-        os.makedirs(self.dir, exist_ok=True)
-        self.output_path = self.dir + "benchmark-" + datetime.now().strftime("%m/%d/%Y_%H:%M:%S").replace("/","_").replace(":","_").replace("\\","_") + ".json"
+
+        # Output JSON
+        os.makedirs(dir, exist_ok=True)
+        self.output_path = dir + "benchmark-" + datetime.now().strftime("%m/%d/%Y_%H:%M:%S").replace("/","_").replace(":","_").replace("\\","_") + ".json"
 
     def visualization(self):
         print("Visualization!")
@@ -62,7 +67,6 @@ class Pipeline:
 
                 # Save benchmark current results
                 self.save()
-
 
 p = Pipeline()
 p.visualization()

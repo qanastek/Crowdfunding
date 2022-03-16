@@ -38,6 +38,6 @@ class TrainSVM(Trainer):
             ),
             "args": [
                 {"epochs":15, "penalty":"l1", "loss":"squared_hinge", "dual":False},
-                {"epochs":15, "penalty":"l2", "loss":"squared_hinge", "dual":True},
+                {"epochs":15, "penalty":"l2", "loss":"squared_hinge", "dual":False},
             ]
         }
