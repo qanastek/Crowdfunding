@@ -1,7 +1,7 @@
 from abc import abstractmethod
 
 from Dataset import Dataset
-from sklearn.metrics import classification_report, f1_score
+from sklearn.metrics import classification_report, f1_score, accuracy_score
 
 class Trainer:
     """
@@ -58,7 +58,7 @@ class Trainer:
     def predict(self, data):
         return self.model.predict(data)
 
-    def evaluate(self, mode="dev"):
+    def evaluate(self, mode="dev", method="accuracy_score"):
 
         if mode == "dev":
             x, y = self.ds.x_dev, self.ds.y_dev
@@ -70,7 +70,11 @@ class Trainer:
 
         preds = self.predict(x)
         
-        f1 = f1_score(y_true=y, y_pred=preds)
+        # Compute classification score
+        if method == "accuracy_score":
+            classification_score = accuracy_score(y_true=y, y_pred=preds)
+        else:
+            classification_score = f1_score(y_true=y, y_pred=preds)
 
         f1_matrix = classification_report(
             y,
@@ -79,4 +83,4 @@ class Trainer:
             zero_division = 1
         )
         
-        return f1, f1_matrix
+        return classification_score, f1_matrix

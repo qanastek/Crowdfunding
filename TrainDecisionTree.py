@@ -9,24 +9,40 @@ class TrainDecisionTree(Trainer):
     """
 
     def __init__(self, path, shuffle=True, seed=0, save_gzip_path=None, clean_gzip=False, normalizer="StandardScaler"):
-        super().__init__(path, shuffle=shuffle, seed=seed, save_gzip_path=save_gzip_path, clean_gzip=clean_gzip, normalizer=normalizer, train_ratio=0.75)
-        self.EPOCHS = 999999999
+        super().__init__(path, shuffle=shuffle, seed=seed, save_gzip_path=save_gzip_path, clean_gzip=clean_gzip, normalizer=normalizer)
 
-    def train(self):
+    def train(self, depth=10, criterion="gini"):
 
-        classifier = DecisionTreeClassifier(max_depth=10)
-        # classifier = DecisionTreeClassifier()
+        self.model = DecisionTreeClassifier(
+            max_depth=depth,
+            criterion=criterion,
+        )
 
         print("> START TRAINING !")
-        self.model = classifier.fit(self.ds.x_train, self.ds.y_train)
+        self.model.fit(self.ds.x_train, self.ds.y_train)
+        print("> TRAINING FINISHED !")
 
-        print("Score train: ", classifier.score(self.ds.x_train, self.ds.y_train))
-        print("Score test: ", classifier.score(self.ds.x_test, self.ds.y_test))
+    @staticmethod
+    def benchmarks():
+        data_path = "data/StandardScaler_only"
+        return {
+            "name": "DecisionTree",
+            "model": TrainDecisionTree(
+                "data/projects.csv",
+                normalizer="StandardScaler",
+                save_gzip_path=data_path,
+                clean_gzip=False
+            ),
+            "args": [
 
-# s = TrainSVM("data/short.csv", normalizer="StandardScaler")
-# s = TrainSVM("data/short.csv", normalizer="MinMaxScaler")
-# s = TrainSVM("data/short.csv", normalizer=None)
-s = TrainDecisionTree("data/projects.csv", normalizer="StandardScaler")
-s.train()
-f1 = s.evaluate()
-print(f1)
+                {"depth":1, "criterion":"gini"},
+                {"depth":3, "criterion":"gini"},
+                {"depth":5, "criterion":"gini"},
+                {"depth":10, "criterion":"gini"},
+
+                {"depth":1, "criterion":"entropy"},
+                {"depth":3, "criterion":"entropy"},
+                {"depth":5, "criterion":"entropy"},
+                {"depth":10, "criterion":"entropy"},
+            ]
+        }

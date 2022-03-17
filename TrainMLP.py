@@ -10,23 +10,48 @@ class TrainMLP(Trainer):
 
     def __init__(self, path, shuffle=True, seed=0, save_gzip_path=None, clean_gzip=False, normalizer="StandardScaler"):
         super().__init__(path, shuffle=shuffle, seed=seed, save_gzip_path=save_gzip_path, clean_gzip=clean_gzip, normalizer=normalizer)
-        self.EPOCHS = 999999999
 
-    def train(self):
+    def train(
+        self,
+        epochs=15,
+        activation="relu",
+        solver="adam",
+        learning_rate="constant",
+        learning_rate_init=0.001,
+        early_stopping=True,
+    ):
 
-        m = MLPClassifier(
-            random_state=1,
-            max_iter = 1,
-            # learning_rate = 0.01,
+        self.model = MLPClassifier(
+            random_state = 1,
+            max_iter = epochs,
+            activation = activation,
+            solver = solver,
+            learning_rate = learning_rate,
+            learning_rate_init = learning_rate_init,
+            early_stopping = early_stopping,
         )
 
         print("> START TRAINING !")
-        self.model = m.fit(self.ds.x_train, self.ds.y_train)
+        self.model.fit(self.ds.x_train, self.ds.y_train)
+        print("> TRAINING FINISHED !")
 
-        print("Score train: ", m.score(self.ds.x_train, self.ds.y_train))
-        print("Score test: ", m.score(self.ds.x_test, self.ds.y_test))
+    @staticmethod
+    def benchmarks():
+        data_path = "data/StandardScaler_only"
+        return {
+            "name": "MLP",
+            "model": TrainMLP(
+                "data/projects.csv",
+                normalizer="StandardScaler",
+                save_gzip_path=data_path,
+                clean_gzip=False
+            ),
+            "args": [
 
-s = TrainMLP("data/projects.csv", normalizer="StandardScaler")
-s.train()
-f1 = s.evaluate()
-print(f1)
+                {"epochs":15, "activation":"relu", "solver":"adam", "learning_rate":"adaptive", "learning_rate_init":0.001, "early_stopping":True},
+                {"epochs":15, "activation":"relu", "solver":"sgd", "learning_rate":"adaptive", "learning_rate_init":0.001, "early_stopping":True},
+
+                {"epochs":15, "activation":"tanh", "solver":"adam", "learning_rate":"adaptive", "learning_rate_init":0.001, "early_stopping":True},
+                {"epochs":15, "activation":"tanh", "solver":"sgd", "learning_rate":"adaptive", "learning_rate_init":0.001, "early_stopping":True},
+            ]
+        }

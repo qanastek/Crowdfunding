@@ -1,0 +1,118 @@
+[
+    {
+        "name": "SVM",
+        "dataset": "data/StandardScaler_only",
+        "hyper_params": {
+            "epochs": 15,
+            "penalty": "l1",
+            "loss": "squared_hinge",
+            "dual": false,
+            "C": 1.0,
+            "tol": 0.0001
+        },
+        "score": 0.6492313550045214,
+        "f1_matrix": "              precision    recall  f1-score   support\n\n           0       0.66      0.63      0.65     21145\n           1       0.64      0.66      0.65     20877\n\n    accuracy                           0.65     42022\n   macro avg       0.65      0.65      0.65     42022\nweighted avg       0.65      0.65      0.65     42022\n",
+        "training_date": "2022-03-17 04:10:00.790238",
+        "model_path": "benchmarks/03_17_2022_04_09_58/7251833175829825120.pkl"
+    },
+    {
+        "name": "SVM",
+        "dataset": "data/StandardScaler_only",
+        "hyper_params": {
+            "epochs": 15,
+            "penalty": "l2",
+            "loss": "squared_hinge",
+            "dual": false,
+            "C": 1.0,
+            "tol": 0.0001
+        },
+        "score": 0.6490885726524201,
+        "f1_matrix": "              precision    recall  f1-score   support\n\n           0       0.66      0.63      0.65     21145\n           1       0.64      0.66      0.65     20877\n\n    accuracy                           0.65     42022\n   macro avg       0.65      0.65      0.65     42022\nweighted avg       0.65      0.65      0.65     42022\n",
+        "training_date": "2022-03-17 04:10:03.276612",
+        "model_path": "benchmarks/03_17_2022_04_09_58/-972665367086634359.pkl"
+    },
+    {
+        "name": "DecisionTree",
+        "dataset": "data/StandardScaler_only",
+        "hyper_params": {
+            "depth": 1,
+            "criterion": "gini"
+        },
+        "score": 0.5871924230165152,
+        "f1_matrix": "              precision    recall  f1-score   support\n\n           0       0.71      0.30      0.43     21145\n           1       0.55      0.87      0.68     20877\n\n    accuracy                           0.59     42022\n   macro avg       0.63      0.59      0.55     42022\nweighted avg       0.63      0.59      0.55     42022\n",
+        "training_date": "2022-03-17 04:10:05.399489",
+        "model_path": "benchmarks/03_17_2022_04_09_58/-2402491969741552990.pkl"
+    },
+    {
+        "name": "DecisionTree",
+        "dataset": "data/StandardScaler_only",
+        "hyper_params": {
+            "depth": 3,
+            "criterion": "gini"
+        },
+        "score": 0.6091809052401124,
+        "f1_matrix": "              precision    recall  f1-score   support\n\n           0       0.61      0.60      0.61     21145\n           1       0.61      0.61      0.61     20877\n\n    accuracy                           0.61     42022\n   macro avg       0.61      0.61      0.61     42022\nweighted avg       0.61      0.61      0.61     42022\n",
+        "training_date": "2022-03-17 04:10:06.157772",
+        "model_path": "benchmarks/03_17_2022_04_09_58/-6983117493301362776.pkl"
+    },
+    {
+        "name": "DecisionTree",
+        "dataset": "data/StandardScaler_only",
+        "hyper_params": {
+            "depth": 5,
+            "criterion": "gini"
+        },
+        "score": 0.6181523963638095,
+        "f1_matrix": "              precision    recall  f1-score   support\n\n           0       0.62      0.62      0.62     21145\n           1       0.62      0.61      0.61     20877\n\n    accuracy                           0.62     42022\n   macro avg       0.62      0.62      0.62     42022\nweighted avg       0.62      0.62      0.62     42022\n",
+        "training_date": "2022-03-17 04:10:07.269139",
+        "model_path": "benchmarks/03_17_2022_04_09_58/-3340072458014730916.pkl"
+    },
+    {
+        "name": "DecisionTree",
+        "dataset": "data/StandardScaler_only",
+        "hyper_params": {
+            "depth": 10,
+            "criterion": "gini"
+        },
+        "score": 0.6029222788063395,
+        "f1_matrix": "              precision    recall  f1-score   support\n\n           0       0.69      0.39      0.50     21145\n           1       0.57      0.82      0.67     20877\n\n    accuracy                           0.60     42022\n   macro avg       0.63      0.60      0.58     42022\nweighted avg       0.63      0.60      0.58     42022\n",
+        "training_date": "2022-03-17 04:10:09.151703",
+        "model_path": "benchmarks/03_17_2022_04_09_58/-2045151044682520110.pkl"
+    },
+    {
+        "name": "DecisionTree",
+        "dataset": "data/StandardScaler_only",
+        "hyper_params": {
+            "depth": 1,
+            "criterion": "entropy"
+        },
+        "score": 0.5871924230165152,
+        "f1_matrix": "              precision    recall  f1-score   support\n\n           0       0.71      0.30      0.43     21145\n           1       0.55      0.87      0.68     20877\n\n    accuracy                           0.59     42022\n   macro avg       0.63      0.59      0.55     42022\nweighted avg       0.63      0.59      0.55     42022\n",
+        "training_date": "2022-03-17 04:10:09.572215",
+        "model_path": "benchmarks/03_17_2022_04_09_58/-2214927514127974110.pkl"
+    },
+    {
+        "name": "DecisionTree",
+        "dataset": "data/StandardScaler_only",
+        "hyper_params": {
+            "depth": 3,
+            "criterion": "entropy"
+        },
+        "score": 0.6091809052401124,
+        "f1_matrix": "              precision    recall  f1-score   support\n\n           0       0.61      0.60      0.61     21145\n           1       0.61      0.61      0.61     20877\n\n    accuracy                           0.61     42022\n   macro avg       0.61      0.61      0.61     42022\nweighted avg       0.61      0.61      0.61     42022\n",
+        "training_date": "2022-03-17 04:10:10.311402",
+        "model_path": "benchmarks/03_17_2022_04_09_58/5128669454340940762.pkl"
+    },
+    {
+        "name": "DecisionTree",
+        "dataset": "data/StandardScaler_only",
+        "hyper_params": {
+            "depth": 5,
+            "criterion": "entropy"
+        },
+        "score": 0.6143210699157584,
+        "f1_matrix": "              precision    recall  f1-score   support\n\n           0       0.62      0.60      0.61     21145\n           1       0.61      0.62      0.62     20877\n\n    accuracy                           0.61     42022\n   macro avg       0.61      0.61      0.61     42022\nweighted avg       0.61      0.61      0.61     42022\n",
+        "training_date": "2022-03-17 04:10:11.429800",
+        "model_path": "benchmarks/03_17_2022_04_09_58/3656704009355924659.pkl"
+    }
+]

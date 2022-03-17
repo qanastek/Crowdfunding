@@ -12,13 +12,15 @@ class TrainSVM(Trainer):
         super().__init__(path, shuffle=shuffle, seed=seed, save_gzip_path=save_gzip_path, clean_gzip=clean_gzip, normalizer=normalizer)
         self.penalities = ["l2","l1"]
 
-    def train(self, epochs=15, penalty="l2", loss="squared_hinge", dual=True):
+    def train(self, epochs=15, penalty="l2", loss="squared_hinge", dual=True, C=1.0, tol=1e-4):
 
         self.model = LinearSVC(
             max_iter = epochs,
             penalty = penalty,
             loss = loss,
             dual = dual,
+            C = C,
+            tol = tol,
         )
 
         print("> START TRAINING !")
@@ -37,7 +39,7 @@ class TrainSVM(Trainer):
                 clean_gzip=False
             ),
             "args": [
-                {"epochs":15, "penalty":"l1", "loss":"squared_hinge", "dual":False},
-                {"epochs":15, "penalty":"l2", "loss":"squared_hinge", "dual":False},
+                {"epochs":15, "penalty":"l1", "loss":"squared_hinge", "dual":False, "C":1.0, "tol":1e-4},
+                {"epochs":15, "penalty":"l2", "loss":"squared_hinge", "dual":False, "C":1.0, "tol":1e-4},
             ]
         }
