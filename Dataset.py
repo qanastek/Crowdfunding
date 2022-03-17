@@ -132,6 +132,10 @@ class Dataset:
             self.x_test, self.y_test   = loaded['x_test'], loaded['y_test']
             print("> Data loaded from cache - DONE!")
 
+            self.label_encoder.classes_ = np.load(self.labels_path)
+            self.labels = self.label_encoder.classes_
+            print("> Labels loaded from cache - DONE!", self.labels)
+
         else:
 
             # Read original CSV file
@@ -149,10 +153,6 @@ class Dataset:
                 df[df.state.isin([col])].sample(min_occurences) for col in ["failed", "successful"]
             ])
             print("> Downsampling the data based on the labels - DONE!")
-            
-            print("> Labels distribution :")
-            for row in df.groupby(['state']).size():
-                print(" >", row)
 
             # Get elapsed time in days
             df['elapsed_days'] = df.apply(lambda row: (row.end_date - row.start_date).days, axis=1)
@@ -200,6 +200,10 @@ class Dataset:
                         print("> Replacing missing categorical by a default value - DONE!")
 
                     df[c] = df[c].fillna(value=value)
+
+            print("> Labels distribution :")
+            for row in df.groupby(['state']).size():
+                print(" >", row)
 
             # Transform to categorial
             for c in self.categorical_features:

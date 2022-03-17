@@ -9,8 +9,10 @@ from Trainer import Trainer
 from TrainSVM import TrainSVM
 from TrainMLP import TrainMLP
 from TrainKNN import TrainKNN
+from TrainKerasMLP import TrainKerasMLP
 from TrainNaiveBayes import TrainNaiveBayes
 from TrainDecisionTree import TrainDecisionTree
+from TrainTransformers import TrainTransformers
 
 from sklearn.metrics import classification_report, accuracy_score
 
@@ -25,6 +27,7 @@ class Pipeline:
         self.models : List[Trainer] = [
             # TrainSVM,
             TrainKNN,
+            # TrainKerasMLP,
             # TrainNaiveBayes,
             # TrainDecisionTree,
             # TrainMLP,
