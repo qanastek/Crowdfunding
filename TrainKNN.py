@@ -3,51 +3,58 @@ from sklearn.neighbors import KNeighborsClassifier
 
 class TrainKNN(Trainer):
 
-    def __init__(self, path, 
-                n_neighbors=3,
-                save_gzip_path=None,
-                clean_gzip=False,
-                num_strategy=None,
-                cat_strategy=None,
-                normalizer=None,
-                normalize_currency = True):
+    def __init__(
+        self,
+        path,
+        save_gzip_path = None,
+        clean_gzip = False,
+        num_strategy = None,
+        cat_strategy = None,
+        normalizer = None,
+        normalize_currency = True,
+    ):
 
-        super().__init__(path,
-            save_gzip_path=save_gzip_path,
-            clean_gzip=clean_gzip,
-            num_strategy=num_strategy,
-            cat_strategy=cat_strategy,
-            normalizer=normalizer,
-            normalize_currency = normalize_currency)
+        super().__init__(
+            path,
+            save_gzip_path = save_gzip_path,
+            clean_gzip = clean_gzip,
+            num_strategy = num_strategy,
+            cat_strategy = cat_strategy,
+            normalizer = normalizer,
+            normalize_currency = normalize_currency
+        )
 
-        self.model = KNeighborsClassifier(n_neighbors=n_neighbors)
+    def train(self, n_neighbors=3, weights="uniform", algorithm="auto"):
 
-    def train(self):
-        print("> Training")
+        self.model = KNeighborsClassifier(
+            n_neighbors = n_neighbors,
+            weights = weights,
+            algorithm = algorithm,
+            n_jobs = -1,
+        )
+
+        print("> START TRAINING !")
         self.model.fit(self.ds.x_train, self.ds.y_train)
-        print("Finish fit!")
-        return self.model.score(self.ds.x_train, self.ds.y_train)
+        print("> TRAINING FINISHED !")
 
-def test():
-
-    ''' 
-    Add test() at the end of this file and run ─▶ python3 TrainKNN.py :
-    Out :
-        > Data loaded - DONE!
-        > Training
-        Finish fit!
-        Training-score : 0.78190961948805
-        Test F-Score :               precision    recall  f1-score   support
-
-                   0       0.60      0.60      0.60     21145
-                   1       0.59      0.60      0.59     20877
-
-            accuracy                           0.60     42022
-           macro avg       0.60      0.60      0.60     42022
-        weighted avg       0.60      0.60      0.60     42022 
-    '''
-
-
-    s = TrainKNN("data/projects.csv", num_strategy="mean", cat_strategy="unique_value", normalizer="StandardScaler", save_gzip_path="data/ds_mean_uv")
-    print("Training-score : " + str(s.train()))
-    print("Test F-Score : " + str(s.evaluate()))
+    @staticmethod
+    def benchmarks():
+        data_path = "data/StandardScaler_only"
+        return {
+            "name": "KNN",
+            "model": TrainKNN(
+                "data/projects.csv",
+                normalizer="StandardScaler",
+                save_gzip_path=data_path,
+                clean_gzip=False,
+            ),
+            "args": [                
+                {"n_neighbors":1, "weights":"uniform", "algorithm":"kd_tree"},
+                {"n_neighbors":2, "weights":"uniform", "algorithm":"kd_tree"},
+                {"n_neighbors":3, "weights":"uniform", "algorithm":"kd_tree"},
+                
+                {"n_neighbors":1, "weights":"distance", "algorithm":"kd_tree"},
+                {"n_neighbors":2, "weights":"distance", "algorithm":"kd_tree"},
+                {"n_neighbors":3, "weights":"distance", "algorithm":"kd_tree"},
+            ]
+        }

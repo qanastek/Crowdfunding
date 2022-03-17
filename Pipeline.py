@@ -8,6 +8,8 @@ from Trainer import Trainer
 
 from TrainSVM import TrainSVM
 from TrainMLP import TrainMLP
+from TrainKNN import TrainKNN
+from TrainNaiveBayes import TrainNaiveBayes
 from TrainDecisionTree import TrainDecisionTree
 
 from sklearn.metrics import classification_report, accuracy_score
@@ -21,7 +23,9 @@ class Pipeline:
 
         # Models to run benchmarks
         self.models : List[Trainer] = [
-            TrainSVM,
+            # TrainSVM,
+            TrainKNN,
+            # TrainNaiveBayes,
             # TrainDecisionTree,
             # TrainMLP,
         ]

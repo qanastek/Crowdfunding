@@ -5,7 +5,7 @@ from sklearn.model_selection import GridSearchCV
 
 class TrainDecisionTree(Trainer):
     """
-    Trainer for the DecisionTreeClassifier
+    Trainer for the Decision Tree
     """
 
     def __init__(self, path, shuffle=True, seed=0, save_gzip_path=None, clean_gzip=False, normalizer="StandardScaler"):
