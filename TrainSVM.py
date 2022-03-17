@@ -36,7 +36,7 @@ class TrainSVM(Trainer):
                 "data/projects.csv",
                 normalizer="StandardScaler",
                 save_gzip_path=data_path,
-                clean_gzip=False
+                clean_gzip=False,
             ),
             "args": [
                 {"epochs":15, "penalty":"l1", "loss":"squared_hinge", "dual":False, "C":1.0, "tol":1e-4},

@@ -22,7 +22,7 @@ class Pipeline:
         # Models to run benchmarks
         self.models : List[Trainer] = [
             TrainSVM,
-            TrainDecisionTree,
+            # TrainDecisionTree,
             # TrainMLP,
         ]
 

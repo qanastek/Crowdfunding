@@ -124,13 +124,13 @@ class Dataset:
         """
 
         # Search for compressed & preprocessed data files
-        if self.save_gzip_path != None and exists(self.save_gzip_path+'.npz') and not self.clean_gzip:
+        if self.save_gzip_path != None and exists(self.save_gzip_path + ".npz") and not self.clean_gzip:
 
             loaded = np.load(self.save_gzip_path + '.npz')
             self.x_train, self.y_train = loaded['x_train'], loaded['y_train']
             self.x_dev, self.y_dev   = loaded['x_dev'], loaded['y_dev']
             self.x_test, self.y_test   = loaded['x_test'], loaded['y_test']
-            print("> Data loaded - DONE!")
+            print("> Data loaded from cache - DONE!")
 
         else:
 
@@ -143,6 +143,7 @@ class Dataset:
             df.state = df.state.replace("canceled", "failed")
             print("> Remove useless states and merge others - DONE!")
 
+            # Downsampling the data
             min_occurences = min(df.groupby(['state']).size().reset_index(drop=True))
             df = pd.concat([
                 df[df.state.isin([col])].sample(min_occurences) for col in ["failed", "successful"]
@@ -156,6 +157,10 @@ class Dataset:
             # Get elapsed time in days
             df['elapsed_days'] = df.apply(lambda row: (row.end_date - row.start_date).days, axis=1)
             print("> Get elapsed time in days - DONE!")
+
+            # Remove elements with more than 365 days
+            df = df[df['elapsed_days'] <= 365]
+            print("> Remove extrema for the elapsed time in days - DONE!")
 
             # Normalize Currency
             if self.normalize_currency:
