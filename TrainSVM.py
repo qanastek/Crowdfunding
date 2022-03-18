@@ -23,9 +23,7 @@ class TrainSVM(Trainer):
             tol = tol,
         )
 
-        print("> START TRAINING !")
         self.model.fit(self.ds.x_train, self.ds.y_train)
-        print("> TRAINING FINISHED !")
 
     @staticmethod
     def benchmarks():

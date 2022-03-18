@@ -1,0 +1,95 @@
+> TESTING HYPER-PARAMETERS FINISHED!
+
+>>> EVALUATE ON TEST SET <<<
+> Data loaded from cache - DONE!
+> Labels loaded from cache - DONE! ['failed' 'successful']
+> Data loaded from cache - DONE!
+> Labels loaded from cache - DONE! ['failed' 'successful']
+
+>>> Best hyper-parameters for SVM <<<
+> {'epochs': 15, 'penalty': 'l2', 'loss': 'squared_hinge', 'dual': False, 'C': 1.0, 'tol': 0.0001}
+> Accuracy : 64.67242569191595 %
+> Best F1-Score :
+              precision    recall  f1-score   support
+
+      failed       0.65      0.63      0.64     21099
+  successful       0.64      0.66      0.65     20922
+
+    accuracy                           0.65     42021
+   macro avg       0.65      0.65      0.65     42021
+weighted avg       0.65      0.65      0.65     42021
+
+> Saved at : benchmarks/03_18_2022_18_31_33/3662372802055150996.pkl
+> Data loaded from cache - DONE!
+> Labels loaded from cache - DONE! ['failed' 'successful']
+QStandardPaths: XDG_RUNTIME_DIR not set, defaulting to '/tmp/runtime-home'
+
+>>> Best hyper-parameters for KNN <<<
+> {'n_neighbors': 1, 'weights': 'uniform', 'algorithm': 'kd_tree'}
+> Accuracy : 57.90200138026225 %
+> Best F1-Score :
+              precision    recall  f1-score   support
+
+      failed       0.56      0.79      0.65     21099
+  successful       0.63      0.37      0.46     20922
+
+    accuracy                           0.58     42021
+   macro avg       0.60      0.58      0.56     42021
+weighted avg       0.60      0.58      0.56     42021
+
+> Saved at : benchmarks/03_18_2022_18_31_33/-9155007123730878252.pkl
+> Data loaded from cache - DONE!
+> Labels loaded from cache - DONE! ['failed' 'successful']
+
+>>> Best hyper-parameters for NaiveBayes <<<
+> {'var_smoothing': 1e-09}
+> Accuracy : 59.16089574260489 %
+> Best F1-Score :
+              precision    recall  f1-score   support
+
+      failed       0.70      0.32      0.44     21099
+  successful       0.56      0.86      0.68     20922
+
+    accuracy                           0.59     42021
+   macro avg       0.63      0.59      0.56     42021
+weighted avg       0.63      0.59      0.56     42021
+
+> Saved at : benchmarks/03_18_2022_18_31_33/7499193438137684250.pkl
+> Data loaded from cache - DONE!
+> Labels loaded from cache - DONE! ['failed' 'successful']
+
+>>> Best hyper-parameters for DecisionTree <<<
+> {'depth': 10, 'criterion': 'entropy'}
+> Accuracy : 64.31784107946027 %
+> Best F1-Score :
+              precision    recall  f1-score   support
+
+      failed       0.65      0.63      0.64     21099
+  successful       0.64      0.66      0.65     20922
+
+    accuracy                           0.64     42021
+   macro avg       0.64      0.64      0.64     42021
+weighted avg       0.64      0.64      0.64     42021
+
+> Saved at : benchmarks/03_18_2022_18_31_33/309982212009756568.pkl
+> Data loaded from cache - DONE!
+> Labels loaded from cache - DONE! ['failed' 'successful']
+
+>>> Best hyper-parameters for MLP <<<
+> {'epochs': 15, 'activation': 'tanh', 'solver': 'sgd', 'learning_rate': 'adaptive', 'learning_rate_init': 0.001, 'early_stopping': True}
+> Accuracy : 64.17981485447753 %
+> Best F1-Score :
+              precision    recall  f1-score   support
+
+      failed       0.64      0.66      0.65     21099
+  successful       0.64      0.63      0.64     20922
+
+    accuracy                           0.64     42021
+   macro avg       0.64      0.64      0.64     42021
+weighted avg       0.64      0.64      0.64     42021
+
+> Saved at : benchmarks/03_18_2022_18_31_33/-2098354952640802171.pkl
+
+real    3m12.004s
+user    21m26.453s
+sys     8m50.781s

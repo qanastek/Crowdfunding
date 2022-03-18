@@ -31,9 +31,7 @@ class TrainMLP(Trainer):
             early_stopping = early_stopping,
         )
 
-        print("> START TRAINING !")
         self.model.fit(self.ds.x_train, self.ds.y_train)
-        print("> TRAINING FINISHED !")
 
     @staticmethod
     def benchmarks():

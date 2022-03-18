@@ -1,0 +1,23 @@
+T01 & Chargement automatique des données pretraitées \\
+T02 & Compression et sauvegarde des données prétraitées \\
+T03 & Analyse préalable des données \\
+T04 & La description du contexte \\
+T05 & Pipeline Python \\
+T06 & Faire MLP avec Scikit \\
+T07 & Voir merge les labels entre eux \\
+T08 & Normalization des currencies en USD \\
+T09 & Essayer plusieurs méthodes de remplacement des données absentes \\
+T10 & Faire DecisionTree et RadomForest \\
+T11 & Split : Train, Dev & Test \\
+T12 & Regrouper Cancel+Failed et Successful et remove le reste (Live, Suspended and Undefined) \\
+T13 & GridSearch pour tout les modèles \\
+T14 & Pledge défini mais state non définit (ils ont atteint leurs score mais sont enregistrer en undefined) \\
+T15 & Description des données dans le rapport \\
+T16 & Remove les dates aberrantes \\
+T17 & Faire une description de l'organisation \\
+T18 & Sur-echantillonage et Sous-echantillonnage des labels \\
+T19 & Décrire les modèles utilisés \\
+T20 & Lister les évaluations des modèles \\
+T21 & Décrire l'architecture et l'implémentation avec ScikitLearn \\
+T22 & Voir la répartition des NaN par rapport aux classes et répartition des classes de base \\
+T23 & ACP Visualisation \\

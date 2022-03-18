@@ -33,9 +33,7 @@ class TrainKNN(Trainer):
             n_jobs = -1,
         )
 
-        print("> START TRAINING !")
         self.model.fit(self.ds.x_train, self.ds.y_train)
-        print("> TRAINING FINISHED !")
 
     @staticmethod
     def benchmarks():
@@ -51,10 +49,22 @@ class TrainKNN(Trainer):
             "args": [                
                 {"n_neighbors":1, "weights":"uniform", "algorithm":"kd_tree"},
                 {"n_neighbors":2, "weights":"uniform", "algorithm":"kd_tree"},
-                {"n_neighbors":3, "weights":"uniform", "algorithm":"kd_tree"},
+                # {"n_neighbors":3, "weights":"uniform", "algorithm":"kd_tree"},
+                # {"n_neighbors":5, "weights":"uniform", "algorithm":"kd_tree"},
+                # {"n_neighbors":10, "weights":"uniform", "algorithm":"kd_tree"},
+                # {"n_neighbors":15, "weights":"uniform", "algorithm":"kd_tree"},
+                # {"n_neighbors":20, "weights":"uniform", "algorithm":"kd_tree"},
+                # {"n_neighbors":30, "weights":"uniform", "algorithm":"kd_tree"},
+                # {"n_neighbors":40, "weights":"uniform", "algorithm":"kd_tree"},
                 
-                {"n_neighbors":1, "weights":"distance", "algorithm":"kd_tree"},
-                {"n_neighbors":2, "weights":"distance", "algorithm":"kd_tree"},
-                {"n_neighbors":3, "weights":"distance", "algorithm":"kd_tree"},
+                # {"n_neighbors":1, "weights":"distance", "algorithm":"kd_tree"},
+                # {"n_neighbors":2, "weights":"distance", "algorithm":"kd_tree"},
+                # {"n_neighbors":3, "weights":"distance", "algorithm":"kd_tree"},
+                # {"n_neighbors":5, "weights":"distance", "algorithm":"kd_tree"},
+                # {"n_neighbors":10, "weights":"distance", "algorithm":"kd_tree"},
+                # {"n_neighbors":15, "weights":"distance", "algorithm":"kd_tree"},
+                # {"n_neighbors":20, "weights":"distance", "algorithm":"kd_tree"},
+                # {"n_neighbors":30, "weights":"distance", "algorithm":"kd_tree"},
+                # {"n_neighbors":40, "weights":"distance", "algorithm":"kd_tree"},
             ]
         }

@@ -4,6 +4,10 @@ import pickle
 from typing import List
 from datetime import datetime
 
+from pqdm.threads import pqdm
+import matplotlib.pyplot as plt
+from sklearn.metrics import classification_report, accuracy_score
+
 from Trainer import Trainer
 
 from TrainSVM import TrainSVM
@@ -12,9 +16,6 @@ from TrainKNN import TrainKNN
 from TrainKerasMLP import TrainKerasMLP
 from TrainNaiveBayes import TrainNaiveBayes
 from TrainDecisionTree import TrainDecisionTree
-from TrainTransformers import TrainTransformers
-
-from sklearn.metrics import classification_report, accuracy_score
 
 class Pipeline:
     """
@@ -25,12 +26,12 @@ class Pipeline:
 
         # Models to run benchmarks
         self.models : List[Trainer] = [
-            # TrainSVM,
+            TrainSVM,
             TrainKNN,
             # TrainKerasMLP,
-            # TrainNaiveBayes,
-            # TrainDecisionTree,
-            # TrainMLP,
+            TrainNaiveBayes,
+            TrainDecisionTree,
+            TrainMLP,
         ]
 
         self.score_metric = "accuracy_score"
@@ -55,18 +56,17 @@ class Pipeline:
 
         self.output_path = self.directory + "benchmark-" + self.date_str + ".json"
 
+    def dataVisualization(self):
+        print("dataVisualization!")
+
     def visualization(self):
-        print("Visualization!")
+        print("visualization!")
     
     def loadModel(self, model_path):
         with open(model_path, 'rb') as f:
             return pickle.load(f)
 
     def save(self, model, card):
-
-        # Save performances
-        with open(self.output_path, 'w') as o:
-            json.dump(self.results, o, indent=4)
 
         # Get output file name
         file_name = self.directory + str(hash(str(card))) + ".pkl"
@@ -77,7 +77,34 @@ class Pipeline:
 
         return file_name
 
+    def TrainEvaluate(self, m, hparams, name):
+
+        # Train it
+        m.train(**hparams)
+
+        # Evaluate the F1-Score
+        classification_score, matrix = m.evaluate(mode="dev", method=self.score_metric)
+
+        print(f"> Hyper-parameters : {str(hparams)}\n{self.metric_name} : {classification_score*100} %")
+        
+        # Build the model card
+        model_card = {
+            "name": name,
+            "dataset": m.ds.save_gzip_path,
+            "hyper_params": hparams,
+            "score": classification_score,
+            "f1_matrix": matrix,
+            "training_date": str(datetime.now()),
+        }
+
+        # Save results and model
+        model_card["model_path"] = self.save(m.model, model_card)
+
+        self.results.append(model_card)
+
     def run(self):
+
+        jobs = []
         
         # For each architecture
         for arch in self.models:
@@ -93,29 +120,13 @@ class Pipeline:
             # Get the hyper-parameters
             for hparams in arch["args"]:
 
-                # Train it
-                m.train(**hparams)
+                jobs.append([m, hparams, name])
 
-                # Evaluate the F1-Score
-                classification_score, matrix = m.evaluate(mode="dev", method=self.score_metric)
+        pqdm(jobs, self.TrainEvaluate, n_jobs=10, argument_type='args')
 
-                print("> Hyper-parameters : ", str(hparams))
-                print(self.metric_name, ": ", classification_score*100, " %")
-                
-                # Build the model card
-                model_card = {
-                    "name": name,
-                    "dataset": m.ds.save_gzip_path,
-                    "hyper_params": hparams,
-                    "score": classification_score,
-                    "f1_matrix": matrix,
-                    "training_date": str(datetime.now()),
-                }
-
-                # Save results and model
-                model_card["model_path"] = self.save(m.model, model_card)
-
-                self.results.append(model_card)
+        # Save performances
+        with open(self.output_path, 'w') as o:
+            json.dump(self.results, o, indent=4)
 
     def findBest(self):
 
@@ -138,17 +149,45 @@ class Pipeline:
             # Get the model name
             name = arch["name"]
 
+            if name == "KNN":
+                elements = {
+                    "uniform": {
+                        "n_neighbors": [],
+                        "score": [],
+                    },
+                    "distance": {
+                        "n_neighbors": [],
+                        "score": [],
+                    },
+                }
+
             best_score = 0
             best_config = None
 
             # For each run
             for run in self.results:
 
+                if name.upper() == "KNN" and run["name"].upper() == "KNN":
+
+                    elements[run['hyper_params']["weights"]]["n_neighbors"].append(
+                        run['hyper_params']["n_neighbors"]
+                    )
+
+                    elements[run['hyper_params']["weights"]]["score"].append(
+                        run["score"]
+                    )
+                    
                 # Chec kif the performance have been improved
                 if run["name"] == name and run["score"] > best_score:
                     best_score = run["score"]
                     best_config = run
             
+            if name == "KNN":
+                plt.plot(elements["uniform"]["n_neighbors"], elements["uniform"]["score"], label="distance")
+                plt.plot(elements["distance"]["n_neighbors"], elements["distance"]["score"], label="uniform")
+                plt.legend()
+                plt.savefig("benchmark_knn.png")
+
             print(f"\n\033[92m>>> Best hyper-parameters for {name} <<<\033[0m")
             print(f"> \033[95m{best_config['hyper_params']}\033[0m")
 
@@ -172,6 +211,6 @@ class Pipeline:
             print(f"> Saved at : \033[96m{best_config['model_path']}\033[0m")
 
 p = Pipeline()
-p.visualization()
+p.dataVisualization()
 p.run()
 p.findBest()
