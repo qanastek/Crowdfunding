@@ -170,7 +170,7 @@ class Dataset:
             print("> Remove useless states and merge others - DONE!")
             
             # Impute missing country values with the currencies
-            df.country.fillna(self.data.currency.apply(lambda c: self.__get_country_by_currency(c)), inplace=True)
+            df.country.fillna(df.currency.apply(lambda c: self.__get_country_by_currency(c)), inplace=True)
             print("> Impute missing country values with the currencies - DONE!")
 
             # Downsampling the data
