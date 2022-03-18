@@ -90,14 +90,34 @@ class AnalysisDataset:
         open(path, 'wb').write(r.content)
 
 
-    def get_country(row:Series):
-        if row.country.isna():
-            if row.currency == 'USD':
-                return 'US'
-            else:
-                return None
+    def get_country(self, currency:str):
+        if currency == 'USD':
+            return 'US'
+        elif currency == 'CAD':
+            return 'CA'
+        elif currency == 'GBP':
+            return 'GB'
+        elif currency == 'AUD':
+            return 'AU'
+        elif currency == 'DKK':
+            return 'DK'
+        elif currency == 'SEK':
+            return 'SE'
+        elif currency == 'NOK':
+            return 'NO'
+        elif currency == 'NZD':
+            return 'NZ'
+        elif currency == 'CHF':
+            return 'CH'
         else:
-            return row.country
+            return None
+        # if row.country.isna():
+        #     if row.currency == 'USD':
+        #         return 'US'
+        #     else:
+        #         return None
+        # else:
+        #     return row.country
 
 
     def print_statistics(self):
@@ -235,8 +255,8 @@ class AnalysisDataset:
         #     height=4, aspect=.7, col_wrap=4)
         # plt.savefig('plots/grid_scatter_cagtegory-{}.png'.format('test'), bbox_inches='tight')
         # plt.close()
+        self.data.country.fillna(self.data.currency.apply(lambda x: self.get_country(x)), inplace=True)
         self.data.country.fillna('UNK', inplace=True)
-        self.data.currency.fillna('UNK', inplace=True)
 
         sns.catplot(y='country',
             hue=None, col="currency",
