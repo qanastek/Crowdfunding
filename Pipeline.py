@@ -27,8 +27,7 @@ class Pipeline:
         # Models to run benchmarks
         self.models : List[Trainer] = [
             TrainSVM,
-            TrainKNN,
-            # TrainKerasMLP,
+            # TrainKNN,
             TrainNaiveBayes,
             TrainDecisionTree,
             TrainMLP,
