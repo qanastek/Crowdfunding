@@ -4,7 +4,7 @@ import pickle
 from typing import List
 from datetime import datetime
 
-from pqdm.threads import pqdm
+# from pqdm.threads import pqdm
 import matplotlib.pyplot as plt
 from sklearn.metrics import classification_report, accuracy_score
 
@@ -22,16 +22,17 @@ class Pipeline:
     Run the benchmarks
     """
 
-    def __init__(self, dir="benchmarks/"):
+    def __init__(self, dir="benchmarks/", threads=12):
+
+        self.threads = threads
 
         # Models to run benchmarks
         self.models : List[Trainer] = [
             TrainSVM,
-            TrainKNN,
-            # TrainKerasMLP,
             TrainNaiveBayes,
             TrainDecisionTree,
             TrainMLP,
+            TrainKNN,
         ]
 
         self.score_metric = "accuracy_score"
@@ -85,7 +86,7 @@ class Pipeline:
         # Evaluate the F1-Score
         classification_score, matrix = m.evaluate(mode="dev", method=self.score_metric)
 
-        print(f"> Hyper-parameters : {str(hparams)}\n{self.metric_name} : {classification_score*100} %")
+        print(f"> {self.metric_name} of {classification_score*100} % using Hyper-parameters : {str(hparams)}")
         
         # Build the model card
         model_card = {
@@ -103,8 +104,6 @@ class Pipeline:
         self.results.append(model_card)
 
     def run(self):
-
-        jobs = []
         
         # For each architecture
         for arch in self.models:
@@ -117,12 +116,15 @@ class Pipeline:
 
             print(f"\n\033[92m>>> {name.upper()} <<<\033[0m\n")
 
+            # jobs = []
+
             # Get the hyper-parameters
             for hparams in arch["args"]:
 
-                jobs.append([m, hparams, name])
+                self.TrainEvaluate(m, hparams, name)
+                # jobs.append([m, hparams, name])
 
-        pqdm(jobs, self.TrainEvaluate, n_jobs=10, argument_type='args')
+            # pqdm(jobs, self.TrainEvaluate, n_jobs=self.threads, argument_type='args')
 
         # Save performances
         with open(self.output_path, 'w') as o:
@@ -149,44 +151,16 @@ class Pipeline:
             # Get the model name
             name = arch["name"]
 
-            if name == "KNN":
-                elements = {
-                    "uniform": {
-                        "n_neighbors": [],
-                        "score": [],
-                    },
-                    "distance": {
-                        "n_neighbors": [],
-                        "score": [],
-                    },
-                }
-
             best_score = 0
             best_config = None
 
             # For each run
             for run in self.results:
-
-                if name.upper() == "KNN" and run["name"].upper() == "KNN":
-
-                    elements[run['hyper_params']["weights"]]["n_neighbors"].append(
-                        run['hyper_params']["n_neighbors"]
-                    )
-
-                    elements[run['hyper_params']["weights"]]["score"].append(
-                        run["score"]
-                    )
                     
                 # Chec kif the performance have been improved
                 if run["name"] == name and run["score"] > best_score:
                     best_score = run["score"]
                     best_config = run
-            
-            if name == "KNN":
-                plt.plot(elements["uniform"]["n_neighbors"], elements["uniform"]["score"], label="distance")
-                plt.plot(elements["distance"]["n_neighbors"], elements["distance"]["score"], label="uniform")
-                plt.legend()
-                plt.savefig("benchmark_knn.png")
 
             print(f"\n\033[92m>>> Best hyper-parameters for {name} <<<\033[0m")
             print(f"> \033[95m{best_config['hyper_params']}\033[0m")
@@ -199,18 +173,26 @@ class Pipeline:
             acc = accuracy_score(y_true=y, y_pred=preds)
             print(f"> Accuracy : {acc*100} %")
 
-            # Evaluate F1-Score
-            print(f"> Best F1-Score :")
-            print(classification_report(
+            f1 = classification_report(
                 y,
                 preds,
                 target_names = labels,
                 zero_division = 1,
-            ))
+                digits = 4,
+            )
+
+            # Evaluate F1-Score
+            print(f"> Best F1-Score :")
+            print(f1)
+
+            # Save best model F1-Score
+            file_out = open(self.directory + "best_model-" + name + ".txt", "w")
+            file_out.write(f"Accuracy of {acc*100} % \n\n {str(best_config['hyper_params'])} \n\n {str(f1)}")
+            file_out.close()
 
             print(f"> Saved at : \033[96m{best_config['model_path']}\033[0m")
 
-p = Pipeline()
+p = Pipeline(threads=10)
 p.dataVisualization()
 p.run()
 p.findBest()

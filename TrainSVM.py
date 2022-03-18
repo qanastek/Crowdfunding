@@ -37,7 +37,53 @@ class TrainSVM(Trainer):
                 clean_gzip=False,
             ),
             "args": [
-                {"epochs":15, "penalty":"l1", "loss":"squared_hinge", "dual":False, "C":1.0, "tol":1e-4},
-                {"epochs":15, "penalty":"l2", "loss":"squared_hinge", "dual":False, "C":1.0, "tol":1e-4},
+                {"epochs":100, "penalty":"l1", "loss":"squared_hinge", "dual":False, "C":1.00, "tol":1e-4},
+                {"epochs":1000, "penalty":"l2", "loss":"squared_hinge", "dual":False, "C":1.00, "tol":1e-4},
+
+                {"epochs":100, "penalty":"l1", "loss":"squared_hinge", "dual":False, "C":10.0, "tol":1e-4},
+                {"epochs":1000, "penalty":"l2", "loss":"squared_hinge", "dual":False, "C":10.0, "tol":1e-4},
+
+                {"epochs":100, "penalty":"l1", "loss":"squared_hinge", "dual":False, "C":100.0, "tol":1e-4},
+                {"epochs":1000, "penalty":"l2", "loss":"squared_hinge", "dual":False, "C":100.0, "tol":1e-4},
+
+                
+                {"epochs":100, "penalty":"l1", "loss":"squared_hinge", "dual":False, "C":1.00, "tol":1e-5},
+                {"epochs":1000, "penalty":"l2", "loss":"squared_hinge", "dual":False, "C":1.00, "tol":1e-5},
+
+                {"epochs":100, "penalty":"l1", "loss":"squared_hinge", "dual":False, "C":10.0, "tol":1e-5},
+                {"epochs":1000, "penalty":"l2", "loss":"squared_hinge", "dual":False, "C":10.0, "tol":1e-5},
+
+                {"epochs":100, "penalty":"l1", "loss":"squared_hinge", "dual":False, "C":100.0, "tol":1e-5},
+                {"epochs":1000, "penalty":"l2", "loss":"squared_hinge", "dual":False, "C":100.0, "tol":1e-5},
+                
+                
+                {"epochs":100, "penalty":"l1", "loss":"squared_hinge", "dual":False, "C":1.00, "tol":1e-6},
+                {"epochs":1000, "penalty":"l2", "loss":"squared_hinge", "dual":False, "C":1.00, "tol":1e-6},
+
+                {"epochs":100, "penalty":"l1", "loss":"squared_hinge", "dual":False, "C":10.0, "tol":1e-6},
+                {"epochs":1000, "penalty":"l2", "loss":"squared_hinge", "dual":False, "C":10.0, "tol":1e-6},
+
+                {"epochs":100, "penalty":"l1", "loss":"squared_hinge", "dual":False, "C":100.0, "tol":1e-6},
+                {"epochs":1000, "penalty":"l2", "loss":"squared_hinge", "dual":False, "C":100.0, "tol":1e-6},
+                
+                
+                {"epochs":100, "penalty":"l1", "loss":"squared_hinge", "dual":False, "C":1.00, "tol":1e-7},
+                {"epochs":1000, "penalty":"l2", "loss":"squared_hinge", "dual":False, "C":1.00, "tol":1e-7},
+
+                {"epochs":100, "penalty":"l1", "loss":"squared_hinge", "dual":False, "C":10.0, "tol":1e-7},
+                {"epochs":1000, "penalty":"l2", "loss":"squared_hinge", "dual":False, "C":10.0, "tol":1e-7},
+
+                {"epochs":100, "penalty":"l1", "loss":"squared_hinge", "dual":False, "C":100.0, "tol":1e-7},
+                {"epochs":1000, "penalty":"l2", "loss":"squared_hinge", "dual":False, "C":100.0, "tol":1e-7},
+                
+                
+                {"epochs":100, "penalty":"l1", "loss":"squared_hinge", "dual":False, "C":1.00, "tol":1e-8},
+                {"epochs":1000, "penalty":"l2", "loss":"squared_hinge", "dual":False, "C":1.00, "tol":1e-8},
+
+                {"epochs":100, "penalty":"l1", "loss":"squared_hinge", "dual":False, "C":10.0, "tol":1e-8},
+                {"epochs":1000, "penalty":"l2", "loss":"squared_hinge", "dual":False, "C":10.0, "tol":1e-8},
+
+                {"epochs":100, "penalty":"l1", "loss":"squared_hinge", "dual":False, "C":100.0, "tol":1e-8},
+                {"epochs":1000, "penalty":"l2", "loss":"squared_hinge", "dual":False, "C":100.0, "tol":1e-8},
             ]
         }
