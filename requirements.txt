@@ -4,3 +4,5 @@ tables
 tqdm
 sklearn
 requests
+CurrencyConverter
+tensorflow

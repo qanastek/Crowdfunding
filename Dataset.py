@@ -83,6 +83,28 @@ class Dataset:
 
         # Load the corpora
         self.__load(path)
+
+    def __get_country_by_currency(self, currency:str):
+        if currency == 'USD':
+            return 'US'
+        elif currency == 'CAD':
+            return 'CA'
+        elif currency == 'GBP':
+            return 'GB'
+        elif currency == 'AUD':
+            return 'AU'
+        elif currency == 'DKK':
+            return 'DK'
+        elif currency == 'SEK':
+            return 'SE'
+        elif currency == 'NOK':
+            return 'NO'
+        elif currency == 'NZD':
+            return 'NZ'
+        elif currency == 'CHF':
+            return 'CH'
+        else:
+            return None
     
     def __transform(self, sub_df: pd.DataFrame, mode="train"):
         """
@@ -146,6 +168,10 @@ class Dataset:
             df = df.drop(df[df.state.str.upper().isin(["LIVE", "SUSPENDED", "UNDEFINED"])].index)
             df.state = df.state.replace("canceled", "failed")
             print("> Remove useless states and merge others - DONE!")
+            
+            # Impute missing country values with the currencies
+            df.country.fillna(df.currency.apply(lambda c: self.__get_country_by_currency(c)), inplace=True)
+            print("> Impute missing country values with the currencies - DONE!")
 
             # Downsampling the data
             min_occurences = min(df.groupby(['state']).size().reset_index(drop=True))

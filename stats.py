@@ -15,6 +15,6 @@ if __name__ == "__main__":
     print(' [ANALYSIS]')
     print('##############################################################################')
     data.print_statistics()
-    data.build_plots_numerical()
+    # data.build_plots_numerical()
     data.build_plots_categorial()
     print('##############################################################################')

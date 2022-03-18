@@ -46,4 +46,55 @@
       - Group 'failed' et 'canceled'
       - Remove 'live', 'suspended' et 'undefined'
 
-## Processing
+## Visualisation
+
+### TODO
+
+- countplots for each categorical variables by sets of 10 values (max colors in color palette)
+- FacetPlot for each combination of categorical and numerical variable.
+
+### References
+
+- <https://www.kaggle.com/abhishekmamidi/everything-you-can-do-with-seaborn>
+- <https://towardsdatascience.com/pair-plot-and-pairgrid-in-details-f782975032ea>
+- <http://seaborn.pydata.org/tutorial/categorical.html>
+- <https://seaborn.pydata.org/generated/seaborn.PairGrid.html>
+- <https://seaborn.pydata.org/tutorial/color_palettes.html>
+- <https://seaborn.pydata.org/tutorial/axis_grids.html>
+
+## Data Cleaning (in general, NETTOYAGE)
+
+- Transform values
+  - Calculate 'duration' from 'start_date' and 'end_date'.
+  - Normalize 'currency' to USD in 'goal' for more accurate comparisons.
+  - Reduce problem to a binary classification (label => Success 0 or 1)
+    - Group 'state' values of 'failed' and 'canceled' together.
+    - Remove 'state' values of 'live', 'suspended' and 'undefined'.
+- Remove outliers
+  - Remove entries with invalid dates set to Unix epoch (January 1, 1970).
+- Impute missing values
+  - Impute missing numerical values via mean, median or constant 'UNK' value.
+    - N/A
+  - Impute missing categorical values via most frequent term or constant 'UNK' value.
+    - sex
+  - Impute missing 'country' values from 'currency' used.
+- Remove useless columns
+  - Variables that are identifiers.
+    - id
+    - name
+  - Variables that are dates.
+    - start_date
+    - end_date
+  - Variables that are outside of our control if we try to recreate a success.
+    - pledged
+    - backers
+
+## Data Preprocessing (for training, RECODAGE + PRÉTRAITEMENT)
+
+- One-Hot encode the categorical variables.
+  - category
+  - subcategory
+  - country
+  - sex
+- Normalize the sample sizes for each 'state'. (upsampling vs downsampling)
+- Compute term frequencies (TF-IDF) for 'names'.
