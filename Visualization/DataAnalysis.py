@@ -196,9 +196,31 @@ class DataAnalysis:
         for var in vars:
             plt.subplots()
             sns.countplot(data=self.data, y=var, palette="crest")
-            plt.savefig('plots/after_cat_catplot_{}.png'.format(var), bbox_inches='tight')
+            plt.savefig('plots/after_cleaning_cat_catplot_{}.png'.format(var), bbox_inches='tight')
             plt.close()
         
+        # Downsampling the data
+        min_occurences = min(self.data.groupby(['state']).size().reset_index(drop=True))
+        print(f"min_occurences = {min_occurences}")
+        self.data = pd.concat([
+            self.data[self.data.state.isin([col])].sample(min_occurences) for col in ["FAILED", "SUCCESSFUL"]
+        ])
+        
+        # After downsampling
+        vars = [
+            'category',
+            'country',
+            'sex',
+            'currency',
+            'state',
+        ]
+        for var in vars:
+            plt.subplots()
+            sns.countplot(data=self.data, y=var, palette="crest")
+            plt.savefig('plots/after_downsampling_cat_catplot_{}.png'.format(var), bbox_inches='tight')
+            plt.close()
+
+
 
 
 
