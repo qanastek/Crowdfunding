@@ -28,11 +28,11 @@ class Pipeline:
 
         # Models to run benchmarks
         self.models : List[Trainer] = [
-            TrainSVM,
             TrainNaiveBayes,
-            TrainDecisionTree,
-            TrainMLP,
-            TrainKNN,
+            # TrainDecisionTree,
+            # TrainSVM,
+            # TrainMLP,
+            # TrainKNN,
         ]
 
         self.score_metric = "accuracy_score"
@@ -59,9 +59,6 @@ class Pipeline:
 
     def dataVisualization(self):
         print("dataVisualization!")
-
-    def visualization(self):
-        print("visualization!")
     
     def loadModel(self, model_path):
         with open(model_path, 'rb') as f:

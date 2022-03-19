@@ -25,7 +25,10 @@ class TrainKerasMLP(Trainer):
     def train(
         self,
         max_epochs=1,
-        batch_size=1024,
+        batch_size=2048,
+        dense_1=100,
+        dense_2=256,
+        drop_out=0.10,
     ):
 
         input_dim = len(self.ds.x_train[0])
@@ -33,13 +36,13 @@ class TrainKerasMLP(Trainer):
         self.model = Sequential()
         self.model.add(BatchNormalization(input_shape=(input_dim,)))
 
-        self.model.add(Dense(100))
-        self.model.add(Dropout(0.10))
+        self.model.add(Dense(dense_1))
+        self.model.add(Dropout(drop_out))
         self.model.add(LeakyReLU())
         self.model.add(BatchNormalization())
 
-        self.model.add(Dense(256))
-        self.model.add(Dropout(0.10))
+        self.model.add(Dense(dense_2))
+        self.model.add(Dropout(drop_out))
         self.model.add(LeakyReLU())
         self.model.add(BatchNormalization())
 
@@ -75,6 +78,7 @@ class TrainKerasMLP(Trainer):
                 clean_gzip=False
             ),
             "args": [
-                {"max_epochs":10},
+                {"max_epochs":10, "dense_1":100, "dense_2":256, "drop_out":0.10},
+                {"max_epochs":10, "dense_1":100, "dense_2":256, "drop_out":0.50},
             ]
         }

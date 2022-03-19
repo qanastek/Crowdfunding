@@ -19,6 +19,8 @@ class TrainMLP(Trainer):
         learning_rate="constant",
         learning_rate_init=0.001,
         early_stopping=True,
+        batch_size=4096,
+        hidden_layer_sizes=100,
     ):
 
         self.model = MLPClassifier(
@@ -29,6 +31,8 @@ class TrainMLP(Trainer):
             learning_rate = learning_rate,
             learning_rate_init = learning_rate_init,
             early_stopping = early_stopping,
+            batch_size = batch_size,
+            hidden_layer_sizes = hidden_layer_sizes,
         )
 
         self.model.fit(self.ds.x_train, self.ds.y_train)
@@ -46,10 +50,19 @@ class TrainMLP(Trainer):
             ),
             "args": [
 
-                {"epochs":15, "activation":"relu", "solver":"adam", "learning_rate":"adaptive", "learning_rate_init":0.001, "early_stopping":True},
-                {"epochs":15, "activation":"relu", "solver":"sgd", "learning_rate":"adaptive", "learning_rate_init":0.001, "early_stopping":True},
+                {"epochs":500, "activation":"relu", "solver":"sgd", "learning_rate":"adaptive", "learning_rate_init":0.001, "early_stopping":True, "hidden_layer_sizes":50},
+                {"epochs":500, "activation":"relu", "solver":"adam", "learning_rate":"adaptive", "learning_rate_init":0.001, "early_stopping":True, "hidden_layer_sizes":50},
+                {"epochs":500, "activation":"relu", "solver":"adam", "learning_rate":"adaptive", "learning_rate_init":0.001, "early_stopping":True, "hidden_layer_sizes":100},
+                {"epochs":500, "activation":"relu", "solver":"adam", "learning_rate":"adaptive", "learning_rate_init":0.001, "early_stopping":True, "hidden_layer_sizes":250},
+                {"epochs":500, "activation":"relu", "solver":"adam", "learning_rate":"adaptive", "learning_rate_init":0.001, "early_stopping":True, "hidden_layer_sizes":500},
 
-                {"epochs":15, "activation":"tanh", "solver":"adam", "learning_rate":"adaptive", "learning_rate_init":0.001, "early_stopping":True},
-                {"epochs":15, "activation":"tanh", "solver":"sgd", "learning_rate":"adaptive", "learning_rate_init":0.001, "early_stopping":True},
+                {"epochs":500, "activation":"tanh", "solver":"sgd", "learning_rate":"adaptive", "learning_rate_init":0.001, "early_stopping":True, "hidden_layer_sizes":50},
+                {"epochs":500, "activation":"tanh", "solver":"adam", "learning_rate":"adaptive", "learning_rate_init":0.001, "early_stopping":True, "hidden_layer_sizes":50},
+                {"epochs":500, "activation":"tanh", "solver":"adam", "learning_rate":"adaptive", "learning_rate_init":0.001, "early_stopping":True, "hidden_layer_sizes":100},
+                {"epochs":500, "activation":"tanh", "solver":"adam", "learning_rate":"adaptive", "learning_rate_init":0.001, "early_stopping":True, "hidden_layer_sizes":250},
+                {"epochs":500, "activation":"tanh", "solver":"adam", "learning_rate":"adaptive", "learning_rate_init":0.001, "early_stopping":True, "hidden_layer_sizes":500},
+                
+                {"epochs":500, "activation":"lbfgs", "solver":"sgd", "learning_rate":"adaptive", "learning_rate_init":0.001, "early_stopping":True, "hidden_layer_sizes":100},
+                {"epochs":500, "activation":"lbfgs", "solver":"adam", "learning_rate":"adaptive", "learning_rate_init":0.001, "early_stopping":True, "hidden_layer_sizes":100},
             ]
         }

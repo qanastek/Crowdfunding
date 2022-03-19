@@ -56,6 +56,8 @@ class TrainKNN(Trainer):
                 {"n_neighbors":20, "weights":"uniform", "algorithm":"kd_tree"},
                 # {"n_neighbors":30, "weights":"uniform", "algorithm":"kd_tree"},
                 {"n_neighbors":40, "weights":"uniform", "algorithm":"kd_tree"},
+                {"n_neighbors":80, "weights":"uniform", "algorithm":"kd_tree"},
+                {"n_neighbors":200, "weights":"uniform", "algorithm":"kd_tree"},
                 
                 {"n_neighbors":1, "weights":"distance", "algorithm":"kd_tree"},
                 {"n_neighbors":2, "weights":"distance", "algorithm":"kd_tree"},
@@ -66,5 +68,7 @@ class TrainKNN(Trainer):
                 {"n_neighbors":20, "weights":"distance", "algorithm":"kd_tree"},
                 # {"n_neighbors":30, "weights":"distance", "algorithm":"kd_tree"},
                 {"n_neighbors":40, "weights":"distance", "algorithm":"kd_tree"},
+                {"n_neighbors":80, "weights":"distance", "algorithm":"kd_tree"},
+                {"n_neighbors":200, "weights":"distance", "algorithm":"kd_tree"},
             ]
         }

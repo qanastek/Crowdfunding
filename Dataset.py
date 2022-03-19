@@ -75,7 +75,7 @@ class Dataset:
         # Define regex parse for date
         self.dateparse = lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S')
 
-        self.numeric_features = ["age", "goal", "elapsed_days"]
+        self.numeric_features = ["age", "goal", "duration_days"]
         self.categorical_features = ["category", "subcategory", "country", "sex"]
 
         # Currency converter
@@ -84,28 +84,6 @@ class Dataset:
         # Load the corpora
         self.__load(path)
 
-    def __get_country_by_currency(self, currency:str):
-        if currency == 'USD':
-            return 'US'
-        elif currency == 'CAD':
-            return 'CA'
-        elif currency == 'GBP':
-            return 'GB'
-        elif currency == 'AUD':
-            return 'AU'
-        elif currency == 'DKK':
-            return 'DK'
-        elif currency == 'SEK':
-            return 'SE'
-        elif currency == 'NOK':
-            return 'NO'
-        elif currency == 'NZD':
-            return 'NZ'
-        elif currency == 'CHF':
-            return 'CH'
-        else:
-            return None
-    
     def __transform(self, sub_df: pd.DataFrame, mode="train"):
         """
         Apply a transformation of the input and references data to be compatible with Scikit-Learn
@@ -150,7 +128,7 @@ class Dataset:
 
             loaded = np.load(self.save_gzip_path + '.npz')
             self.x_train, self.y_train = loaded['x_train'], loaded['y_train']
-            self.x_dev, self.y_dev   = loaded['x_dev'], loaded['y_dev']
+            self.x_dev, self.y_dev     = loaded['x_dev'], loaded['y_dev']
             self.x_test, self.y_test   = loaded['x_test'], loaded['y_test']
             print("> Data loaded from cache - DONE!")
 
@@ -170,7 +148,7 @@ class Dataset:
             print("> Remove useless states and merge others - DONE!")
             
             # Impute missing country values with the currencies
-            df.country.fillna(df.currency.apply(lambda c: self.__get_country_by_currency(c)), inplace=True)
+            df.country.fillna(df.currency.apply(lambda c: c[:2] if c != 'EURO' else None), inplace=True)
             print("> Impute missing country values with the currencies - DONE!")
 
             # Downsampling the data
@@ -181,11 +159,11 @@ class Dataset:
             print("> Downsampling the data based on the labels - DONE!")
 
             # Get elapsed time in days
-            df['elapsed_days'] = df.apply(lambda row: (row.end_date - row.start_date).days, axis=1)
+            df['duration_days'] = df.apply(lambda row: (row.end_date - row.start_date).days, axis=1)
             print("> Get elapsed time in days - DONE!")
 
             # Remove elements with more than 365 days
-            df = df[df['elapsed_days'] <= 365]
+            df = df[df['duration_days'] <= 365]
             print("> Remove extrema for the elapsed time in days - DONE!")
 
             # Normalize Currency
