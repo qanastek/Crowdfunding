@@ -15,7 +15,7 @@ from Trainers.TrainKerasMLP import TrainKerasMLP
 from Trainers.TrainNaiveBayes import TrainNaiveBayes
 from Trainers.TrainDecisionTree import TrainDecisionTree
 
-import Visualization.AnalysisDataset as ds
+import Visualization.DataAnalysis as ds
 
 class Pipeline:
     """
@@ -60,7 +60,7 @@ class Pipeline:
     def dataVisualization(self):
 
         print("\n" + "#"*78 + "\n" + " "*34 + "[DATASET]\n" + "#"*78)
-        data = ds.AnalysisDataset(ds.AnalysisDataset.DATA_PROJECTS_FILE_H5)
+        data = ds.DataAnalysis(ds.DataAnalysis.DATA_PROJECTS_FILE_H5)
 
         print("\n\n" + "#"*78 + "\n" + " "*34 + "[ANALYSIS]\n" + "#"*78)
         data.print_statistics()
@@ -108,6 +108,8 @@ class Pipeline:
         self.results.append(model_card)
 
     def run(self):
+
+        print("\n\n" + "#"*78 + "\n" + " "*34 + "[TRAIN MODELS]\n" + "#"*78)
         
         # For each architecture
         for arch in self.models:
@@ -134,11 +136,11 @@ class Pipeline:
         with open(self.output_path, 'w') as o:
             json.dump(self.results, o, indent=4)
 
-    def findBest(self):
-
         print(f"\n> TESTING HYPER-PARAMETERS FINISHED!")
 
-        print(f"\n\033[92m>>> EVALUATE ON TEST SET <<<\033[0m")
+    def findBest(self):
+
+        print("\n\n" + "#"*78 + "\n" + " "*24 + "\033[92m>>> EVALUATE ON TEST SET <<<\033[0m\n" + "#"*78)
 
         # Fetch test set
         dataset = self.models[0].benchmarks()["model"].ds
