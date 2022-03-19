@@ -165,6 +165,8 @@ class DataAnalysis:
 
 
     def build_plots_categorial(self):
+
+        # Before removing useless classes
         vars = [
             'category',
             'country',
@@ -175,9 +177,31 @@ class DataAnalysis:
         for var in vars:
             plt.subplots()
             sns.countplot(data=self.data, y=var, palette="crest")
-            plt.savefig('plots/cat_catplot_{}.png'.format(var), bbox_inches='tight')
+            plt.savefig('plots/before_cat_catplot_{}.png'.format(var), bbox_inches='tight')
+            plt.close()
+
+        # Remove useless states and merge others
+        self.data = self.data.drop(self.data[self.data.state.str.upper().isin(["LIVE", "SUSPENDED", "UNDEFINED"])].index)
+        self.data.state = self.data.state.replace("CANCELED", "FAILED")
+        print("> Remove useless states and merge others - DONE!")
+
+        # After removing useless classes
+        vars = [
+            'category',
+            'country',
+            'sex',
+            'currency',
+            'state',
+        ]
+        for var in vars:
+            plt.subplots()
+            sns.countplot(data=self.data, y=var, palette="crest")
+            plt.savefig('plots/after_cat_catplot_{}.png'.format(var), bbox_inches='tight')
             plt.close()
         
+
+
+
         num_vars = [
             'age',
             'goal',
