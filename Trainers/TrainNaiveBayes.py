@@ -1,4 +1,5 @@
-from Trainer import Trainer
+from Trainers.Trainer import Trainer
+
 from sklearn.naive_bayes import GaussianNB
 
 class TrainNaiveBayes(Trainer):

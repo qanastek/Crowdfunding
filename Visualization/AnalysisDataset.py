@@ -34,6 +34,9 @@ class AnalysisDataset:
         # Load the corpora
         self.__load(path)
 
+        # Create the output directory
+        os.makedirs("./plots", exist_ok=True)
+
         # # Transform currencies into USD
         # self.data['usd_goal'] = self.data.apply(lambda row: self.cc.convert(row.goal, row.currency, 'USD'), axis=1)
         # self.data['usd_pledged'] = self.data.apply(lambda row: self.cc.convert(row.pledged, row.currency, 'USD'), axis=1)

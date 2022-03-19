@@ -1,7 +1,6 @@
-from Trainer import Trainer
+from Trainers.Trainer import Trainer
 
 from sklearn.svm import LinearSVC
-from sklearn.model_selection import GridSearchCV
 
 class TrainSVM(Trainer):
     """

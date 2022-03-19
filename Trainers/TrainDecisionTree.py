@@ -1,7 +1,6 @@
-from Trainer import Trainer
+from Trainers.Trainer import Trainer
 
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.model_selection import GridSearchCV
 
 class TrainDecisionTree(Trainer):
     """

@@ -1,7 +1,6 @@
-from Trainer import Trainer
+from Trainers.Trainer import Trainer
 
 from sklearn.neural_network import MLPClassifier
-from sklearn.model_selection import GridSearchCV
 
 class TrainMLP(Trainer):
     """

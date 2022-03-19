@@ -1,18 +1,11 @@
-from Trainer import Trainer
+from Trainers.Trainer import Trainer
 
 import numpy as np
 from sklearn.metrics import classification_report
 
-import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import layers
-
-import tensorflow
 from tensorflow.keras import *
 from tensorflow.keras.layers import *
 from tensorflow.keras.optimizers import *
-from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.callbacks import TensorBoard, ModelCheckpoint
 
 class TrainKerasMLP(Trainer):
     """

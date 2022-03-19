@@ -1,4 +1,5 @@
-from Trainer import Trainer
+from Trainers.Trainer import Trainer
+
 from sklearn.neighbors import KNeighborsClassifier
 
 class TrainKNN(Trainer):

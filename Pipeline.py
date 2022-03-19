@@ -4,18 +4,18 @@ import pickle
 from typing import List
 from datetime import datetime
 
-# from pqdm.threads import pqdm
-import matplotlib.pyplot as plt
 from sklearn.metrics import classification_report, accuracy_score
 
-from Trainer import Trainer
+from Trainers.Trainer import Trainer
 
-from TrainSVM import TrainSVM
-from TrainMLP import TrainMLP
-from TrainKNN import TrainKNN
-from TrainKerasMLP import TrainKerasMLP
-from TrainNaiveBayes import TrainNaiveBayes
-from TrainDecisionTree import TrainDecisionTree
+from Trainers.TrainSVM import TrainSVM
+from Trainers.TrainMLP import TrainMLP
+from Trainers.TrainKNN import TrainKNN
+from Trainers.TrainKerasMLP import TrainKerasMLP
+from Trainers.TrainNaiveBayes import TrainNaiveBayes
+from Trainers.TrainDecisionTree import TrainDecisionTree
+
+import Visualization.AnalysisDataset as ds
 
 class Pipeline:
     """
@@ -58,8 +58,15 @@ class Pipeline:
         self.output_path = self.directory + "benchmark-" + self.date_str + ".json"
 
     def dataVisualization(self):
-        print("dataVisualization!")
-    
+
+        print("\n" + "#"*78 + "\n" + " "*34 + "[DATASET]\n" + "#"*78)
+        data = ds.AnalysisDataset(ds.AnalysisDataset.DATA_PROJECTS_FILE_H5)
+
+        print("\n\n" + "#"*78 + "\n" + " "*34 + "[ANALYSIS]\n" + "#"*78)
+        data.print_statistics()
+        # data.build_plots_numerical()
+        data.build_plots_categorial()
+
     def loadModel(self, model_path):
         with open(model_path, 'rb') as f:
             return pickle.load(f)
