@@ -26,9 +26,6 @@ class Pipeline:
 
     def __init__(self, dir="benchmarks/"):
 
-        # Run the visualization in a background thread
-        self.dataVisualization()
-
         # Models to run benchmarks
         self.models : List[Trainer] = [
             # TrainNaiveBayes,
@@ -59,6 +56,9 @@ class Pipeline:
         print("Directory : ", self.directory)
 
         self.output_path = self.directory + "benchmark-" + self.date_str + ".json"
+
+        # Run the visualization in a background thread
+        self.dataVisualization()
 
     def dataVisualization(self):
         """
