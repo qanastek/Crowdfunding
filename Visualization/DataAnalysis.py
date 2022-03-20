@@ -1,8 +1,9 @@
-from datetime import datetime
 import os
+import sys
 import requests
 import seaborn as sns
 from typing import List
+from datetime import datetime
 import matplotlib.pyplot as plt
 
 import numpy as np
@@ -17,7 +18,9 @@ class DataAnalysis:
     DATA_PROJECTS_FILE_H5 = "data/projects.h5"
     DATA_PROJECTS_URL = 'https://filesender.renater.fr/?s=download&token=2f5ed948-6e35-4bf1-88ed-7ab5dd0411b9'
 
-    def __init__(self, path):
+    def __init__(self, path, output_dir="./plots/"):
+
+        self.output_dir = output_dir
 
         sns.set_theme(style="whitegrid")
         sns.color_palette("crest", as_cmap=True)
@@ -31,13 +34,22 @@ class DataAnalysis:
         # Currency converter
         self.cc = CurrencyConverter()
 
+        # Create the output directory
+        os.makedirs(self.output_dir, exist_ok=True)
+
+        # Redirect STDOUT
+        sys.stdout = open(self.output_dir + "log.txt", 'w')
+
         # Load the corpora
         self.__load(path)
-
-        # Create the output directory
-        os.makedirs("./plots", exist_ok=True)
+        
+        sys.stdout = sys.__stdout__
 
     def __load(self, path, cache=False):
+        """
+        Load, Transform and Save the data
+        """
+        
         # Reload previously processed dataset, if available
         if (os.path.isfile(path)):
             print('> Load compressed HD5 file...')
@@ -61,11 +73,17 @@ class DataAnalysis:
         self.data.to_hdf(path, key='data', complevel=9)
 
     def __download_data(self, path:str):
+        """
+        Download the dataset from a remote source
+        """
         print("> Downloading raw CSV file...")
         r = requests.get(DataAnalysis.DATA_PROJECTS_URL, allow_redirects=True)
         open(path, 'wb').write(r.content)
 
     def get_country(self, currency:str):
+        """
+        Convert any curreny in USD
+        """
         if currency == 'USD':
             return 'US'
         elif currency == 'CAD':
@@ -88,6 +106,10 @@ class DataAnalysis:
             return None
 
     def print_statistics(self):
+        """
+        Display basic statistics
+        """
+
         pd.set_option('display.max_rows', None)
         pd.set_option('display.max_colwidth', None)
         pd.set_option('display.float_format', '{:.2f}'.format)
@@ -103,6 +125,10 @@ class DataAnalysis:
         pd.reset_option('display.float_format')
 
     def __preprocess(self):
+        """
+        Normalize types
+        """
+
         print('> Convert textual columns to \'str\'...')
         labels = [
             'id',
@@ -117,6 +143,10 @@ class DataAnalysis:
             self.data[label].replace('\s+', ' ', regex=True, inplace=True)
 
     def __build_numerical_boxplots(self):
+        """
+        Export boxplots
+        """
+
         vars = [
             'age',
             'goal',
@@ -130,10 +160,14 @@ class DataAnalysis:
             plt.subplots()
             # sns.boxplot(data=self.data, x=var, palette="tab10")
             sns.boxenplot(data=self.data, x=var, palette="tab10")
-            plt.savefig('plots/num_boxenplot_{}.png'.format(var), bbox_inches='tight')
+            plt.savefig(self.output_dir + '/num_boxenplot_{}.png'.format(var), bbox_inches='tight')
             plt.close()
 
     def __build_numerical_pairplot(self):
+        """
+        Export pairplots
+        """
+
         vars = [
             'age',
             'log_goal',
@@ -146,25 +180,30 @@ class DataAnalysis:
         g.map_diag(sns.kdeplot)
         g.map_offdiag(sns.scatterplot, size=self.data["state"])
         g.add_legend(title="", adjust_subtitles=True)
-        g.savefig('plots/num_pairgrid.png')
+        g.savefig(self.output_dir + '/num_pairgrid.png')
         return
 
     def build_plots_numerical(self):
+        """
+        Export correlation matrix
+        """
+
         corr=self.data.corr()
         plt.subplots(figsize=(16,9))
         heatmap=sns.heatmap(corr,
                             xticklabels=corr.columns,
                             yticklabels=corr.columns)
         plt.tight_layout()
-        plt.savefig('plots/correlation-matrix.png', bbox_inches='tight')
+        plt.savefig(self.output_dir + '/correlation-matrix.png', bbox_inches='tight')
 
         self.__build_numerical_boxplots()
         self.__build_numerical_pairplot()
         return
 
-
-
     def build_plots_categorial(self):
+        """
+        Export categorical plots
+        """
 
         # Before removing useless classes
         vars = [
@@ -177,7 +216,7 @@ class DataAnalysis:
         for var in vars:
             plt.subplots()
             sns.countplot(data=self.data, y=var, palette="crest")
-            plt.savefig('plots/before_cat_catplot_{}.png'.format(var), bbox_inches='tight')
+            plt.savefig(self.output_dir + '/before_cat_catplot_{}.png'.format(var), bbox_inches='tight')
             plt.close()
 
         # Remove useless states and merge others
@@ -196,7 +235,7 @@ class DataAnalysis:
         for var in vars:
             plt.subplots()
             sns.countplot(data=self.data, y=var, palette="crest")
-            plt.savefig('plots/after_cleaning_cat_catplot_{}.png'.format(var), bbox_inches='tight')
+            plt.savefig(self.output_dir + '/after_cleaning_cat_catplot_{}.png'.format(var), bbox_inches='tight')
             plt.close()
         
         # Downsampling the data
@@ -217,12 +256,8 @@ class DataAnalysis:
         for var in vars:
             plt.subplots()
             sns.countplot(data=self.data, y=var, palette="crest")
-            plt.savefig('plots/after_downsampling_cat_catplot_{}.png'.format(var), bbox_inches='tight')
+            plt.savefig(self.output_dir + '/after_downsampling_cat_catplot_{}.png'.format(var), bbox_inches='tight')
             plt.close()
-
-
-
-
 
         num_vars = [
             'age',
@@ -246,14 +281,14 @@ class DataAnalysis:
             hue=None, col="currency",
             data=self.data, kind="count",
             height=4, aspect=.7, col_wrap=4, sharex=False)
-        plt.savefig('plots/grid_countplot_{}-{}.png'.format('country', 'currency'), bbox_inches='tight')
+        plt.savefig(self.output_dir + '/grid_countplot_{}-{}.png'.format('country', 'currency'), bbox_inches='tight')
         plt.close()
         
         sns.catplot(y='currency',
             hue=None, col="country",
             data=self.data, kind="count",
             height=4, aspect=.7, col_wrap=4, sharex=False)
-        plt.savefig('plots/grid_countplot_{}-{}.png'.format('currency', 'country'), bbox_inches='tight')
+        plt.savefig(self.output_dir + '/grid_countplot_{}-{}.png'.format('currency', 'country'), bbox_inches='tight')
         plt.close()
 
         return

@@ -56,11 +56,6 @@ for e in all_res:
     accuracy = content.split("\n")[5]     
     accuracy = re.sub("\s+", " ", accuracy).split(" ")[-2]
 
-    # print(prec)
-    # print(recc)
-    # print(f1)
-    # print(accuracy)
-
     score = f1
 
     new_score = float(f1)*100

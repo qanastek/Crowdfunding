@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import pickle
 from typing import List
@@ -15,16 +16,17 @@ from Trainers.TrainKerasMLP import TrainKerasMLP
 from Trainers.TrainNaiveBayes import TrainNaiveBayes
 from Trainers.TrainDecisionTree import TrainDecisionTree
 
-import Visualization.DataAnalysis as ds
+from Visualization.DataAnalysis import DataAnalysis
 
 class Pipeline:
     """
     Run the benchmarks
     """
 
-    def __init__(self, dir="benchmarks/", threads=12):
+    def __init__(self, dir="benchmarks/"):
 
-        self.threads = threads
+        # Run the visualization in a background thread
+        self.dataVisualization()
 
         # Models to run benchmarks
         self.models : List[Trainer] = [
@@ -58,14 +60,21 @@ class Pipeline:
         self.output_path = self.directory + "benchmark-" + self.date_str + ".json"
 
     def dataVisualization(self):
+        """
+        Run the visualization in a background thread
+        """
 
-        print("\n" + "#"*78 + "\n" + " "*34 + "[DATASET]\n" + "#"*78)
-        data = ds.DataAnalysis(ds.DataAnalysis.DATA_PROJECTS_FILE_H5)
+        def run():
 
-        print("\n\n" + "#"*78 + "\n" + " "*34 + "[ANALYSIS]\n" + "#"*78)
-        data.print_statistics()
-        # data.build_plots_numerical()
-        data.build_plots_categorial()
+            print("\n" + "#"*78 + "\n" + " "*34 + "[DATASET]\n" + "#"*78)
+            data = DataAnalysis(DataAnalysis.DATA_PROJECTS_FILE_H5)
+
+            print("\n\n" + "#"*78 + "\n" + " "*34 + "[ANALYSIS]\n" + "#"*78)
+            data.print_statistics()
+            # data.build_plots_numerical()
+            data.build_plots_categorial()
+
+        run()
 
     def loadModel(self, model_path):
         with open(model_path, 'rb') as f:
@@ -107,7 +116,10 @@ class Pipeline:
 
         self.results.append(model_card)
 
-    def run(self):
+    def gridSearch(self):
+        """
+        Brute force grid search using hand defined hyper-parameters
+        """
 
         print("\n\n" + "#"*78 + "\n" + " "*34 + "[TRAIN MODELS]\n" + "#"*78)
         
@@ -198,7 +210,6 @@ class Pipeline:
 
             print(f"> Saved at : \033[96m{best_config['model_path']}\033[0m")
 
-p = Pipeline(threads=10)
-p.dataVisualization()
-# p.run()
-# p.findBest()
+p = Pipeline()
+p.gridSearch()
+p.findBest()

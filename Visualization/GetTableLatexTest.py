@@ -67,12 +67,6 @@ for dir, j in zip(dirs, jsons):
                 "f1_score": float(f1)*100,
             }
 
-        # print(model_file)
-        # print(model_name)
-        # print(dir)
-        # print(j)
-        # print()
-
 print(models)
 
 header = """
