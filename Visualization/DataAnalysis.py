@@ -80,30 +80,6 @@ class DataAnalysis:
         r = requests.get(DataAnalysis.DATA_PROJECTS_URL, allow_redirects=True)
         open(path, 'wb').write(r.content)
 
-    def get_country(self, currency:str):
-        """
-        Convert any curreny in USD
-        """
-        if currency == 'USD':
-            return 'US'
-        elif currency == 'CAD':
-            return 'CA'
-        elif currency == 'GBP':
-            return 'GB'
-        elif currency == 'AUD':
-            return 'AU'
-        elif currency == 'DKK':
-            return 'DK'
-        elif currency == 'SEK':
-            return 'SE'
-        elif currency == 'NOK':
-            return 'NO'
-        elif currency == 'NZD':
-            return 'NZ'
-        elif currency == 'CHF':
-            return 'CH'
-        else:
-            return None
 
     def print_statistics(self):
         """
@@ -273,9 +249,29 @@ class DataAnalysis:
             'log_pledged',
             'elapsed_days',
         ]
-
-        self.data.country.fillna(self.data.currency.apply(lambda x: self.get_country(x)), inplace=True)
+        # sns.catplot(x=var,
+        #     hue="state", col="category",
+        #     data=self.data, kind="count",
+        #     height=4, aspect=.7, col_wrap=4)
+        # sns.catplot(y='country', x='age',
+        #     hue="state", col="category",
+        #     data=self.data.sample(1000),
+        #     height=4, aspect=.7, col_wrap=4)
+        # plt.savefig('plots/grid_scatter_cagtegory-{}.png'.format('test'), bbox_inches='tight')
+        # plt.close()
+        print(self.data.loc[self.data.country.isin([None]), 'country'].size)
+        self.data.country.fillna(self.data.currency.apply(lambda c: c[:2] if c != 'EUR' else None), inplace=True)
+        print(self.data.loc[self.data.country.isin([None]), 'country'].size)
         self.data.country.fillna('UNK', inplace=True)
+
+# self.data = self.data.drop(self.data[(self.data.start_date == datetime.fromtimestamp(0)) | (self.data.end_date == datetime.fromtimestamp(0))].index)
+
+        print('start_date: ', self.data.loc[(self.data.start_date == datetime.fromtimestamp(0)), 'start_date'].size)
+        print('  end_date: ', self.data.loc[:, 'start_date'].min())
+        print('  end_date: ', self.data.loc[:, 'start_date'].max())
+        print('  end_date: ', self.data.loc[(self.data.end_date == datetime.fromtimestamp(0)), 'end_date'].size)
+        print('  end_date: ', self.data.loc[:, 'end_date'].min())
+        print('  end_date: ', self.data.loc[:, 'end_date'].max())
 
         sns.catplot(y='country',
             hue=None, col="currency",
