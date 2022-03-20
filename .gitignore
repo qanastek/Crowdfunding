@@ -4,6 +4,8 @@
 *.csv
 *.json
 
+latex_*.txt
+
 ##############
 ### BENCHMARKS
 ##############
