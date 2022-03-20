@@ -6,3 +6,4 @@ sklearn
 requests
 CurrencyConverter
 tensorflow
+lux-api
