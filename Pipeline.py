@@ -200,5 +200,5 @@ class Pipeline:
 
 p = Pipeline(threads=10)
 p.dataVisualization()
-p.run()
-p.findBest()
+# p.run()
+# p.findBest()
