@@ -1,0 +1,20 @@
+
+        \begin{table}[htb!]
+        \centering
+        % \resizebox{\linewidth}{!}{%
+        \rowcolors{1}{fgVeryLightRed}{}
+        \begin{tabular}{ccccc}
+        \rowcolor{fgLightRed}
+        \hline
+        \textbf{Model} & \textbf{Taux d'erreur} & \textbf{Précision} & \textbf{Rappel} & \textbf{F1\_Score} \\ \hline
+	DecisionTree & 63.54 \% & 64.28 \% & 63.54 \% & 63.10 \% \\
+	KNN & 65.70 \% & 65.70 \% & 65.70 \% & 65.70 \% \\
+	MLP & 66.04 \% & 66.04 \% & 66.04 \% & 66.04 \% \\
+	NaiveBayes & 59.76 \% & 63.35 \% & 59.76 \% & 56.98 \% \\
+	SVM & 65.32 \% & 65.41 \% & 65.32 \% & 65.29 \% \\ 
+        \hline\end{tabular}
+        % }
+        \caption{Résultats test.}
+        \label{tab:testResults}
+        \end{table}
+        

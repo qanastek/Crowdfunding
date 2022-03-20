@@ -17,6 +17,7 @@ from Trainers.TrainNaiveBayes import TrainNaiveBayes
 from Trainers.TrainDecisionTree import TrainDecisionTree
 
 from Visualization.DataAnalysis import DataAnalysis
+from Visualization.ResultsToLatex import ResultsToLatex
 
 class Pipeline:
     """
@@ -213,3 +214,4 @@ class Pipeline:
 p = Pipeline()
 p.gridSearch()
 p.findBest()
+ResultsToLatex(input_dir="./benchmarks", save_dir="./Visualization/")
