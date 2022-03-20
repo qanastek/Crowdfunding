@@ -3,6 +3,7 @@ import re, os, json
 def argsToLatex(corpus_sets):
 
     all_latex = {
+        "train": "",
         "dev": "",
         "test": "",
     }
@@ -60,6 +61,7 @@ class ResultsToLatex:
         self.save_dir = save_dir
 
         self.models = {
+            'train': {},
             'dev': {},
             'test': {},
         }
@@ -137,7 +139,10 @@ class ResultsToLatex:
                 # Dev
                 if '.json' in file:
 
-                    corpus_set = "dev"
+                    if '.train' in file:
+                        corpus_set = "train"
+                    else:
+                        corpus_set = "dev"
 
                     # Load and merge the json
                     runs = json.load(open(path_file, 'r'))

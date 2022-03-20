@@ -41,6 +41,7 @@ class Pipeline:
 
         # List of results
         self.results = []
+        self.results_on_train = []
 
         # Output JSON
         os.makedirs(dir, exist_ok=True)
@@ -54,8 +55,9 @@ class Pipeline:
         os.makedirs(self.directory, exist_ok=True)
 
         print("Directory : ", self.directory)
-
-        self.output_path = self.directory + "benchmark-" + self.date_str + ".json"
+        base = self.directory + "benchmark-" + self.date_str
+        self.output_path = base + ".json"
+        self.output_path_train = base + ".train.json"
 
         # Run the visualization in a background thread
         self.dataVisualization()
@@ -92,20 +94,17 @@ class Pipeline:
 
         return file_name
 
-    def TrainEvaluate(self, m, hparams, name):
-
-        # Train it
-        m.train(**hparams)
+    def evaluate(self, model_name, hparams, model, mode):
 
         # Evaluate the F1-Score
-        classification_score, matrix = m.evaluate(mode="dev", method=self.score_metric)
+        classification_score, matrix = model.evaluate(mode=mode, method=self.score_metric)
 
         print(f"> {self.metric_name} of {classification_score*100} % using Hyper-parameters : {str(hparams)}")
         
         # Build the model card
         model_card = {
-            "name": name,
-            "dataset": m.ds.save_gzip_path,
+            "name": model_name,
+            "dataset": model.ds.save_gzip_path,
             "hyper_params": hparams,
             "score": classification_score,
             "f1_matrix": matrix,
@@ -113,8 +112,21 @@ class Pipeline:
         }
 
         # Save results and model
-        model_card["model_path"] = self.save(m.model, model_card)
+        model_card["model_path"] = self.save(model.model, model_card)
 
+        return model_card
+
+    def TrainEvaluate(self, m, hparams, name):
+
+        # Train it
+        m.train(**hparams)
+
+        # Evaluate on Train
+        model_card = self.evaluate(model_name=name, hparams=hparams, model=m, mode="train")
+        self.results_on_train.append(model_card)
+
+        # Evaluate on Dev
+        model_card = self.evaluate(model_name=name, hparams=hparams, model=m, mode="dev")
         self.results.append(model_card)
 
     def gridSearch(self):
@@ -145,7 +157,11 @@ class Pipeline:
 
             # pqdm(jobs, self.TrainEvaluate, n_jobs=self.threads, argument_type='args')
 
-        # Save performances
+        # Save performances on train
+        with open(self.output_path_train, 'w') as o:
+            json.dump(self.results_on_train, o, indent=4)
+
+        # Save performances on dev
         with open(self.output_path, 'w') as o:
             json.dump(self.results, o, indent=4)
 

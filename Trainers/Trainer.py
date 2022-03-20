@@ -60,7 +60,9 @@ class Trainer:
 
     def evaluate(self, mode="dev", method="accuracy_score"):
 
-        if mode == "dev":
+        if mode == "train":
+            x, y = self.ds.x_train, self.ds.y_train
+        elif mode == "dev":
             x, y = self.ds.x_dev, self.ds.y_dev
         elif mode == "test":
             x, y = self.ds.x_test, self.ds.y_test
