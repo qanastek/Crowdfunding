@@ -1,7 +1,9 @@
 import os
 import sys
+from matplotlib.axis import Axis
 import requests
 import seaborn as sns
+from seaborn import FacetGrid
 from typing import List
 from datetime import datetime
 import matplotlib.pyplot as plt
@@ -152,7 +154,7 @@ class DataAnalysis:
 
         self.__build_numerical_correlation_matrix(data_state)
         self.__build_numerical_boxplots(data_state)
-        self.__build_numerical_pairplot(data_state)
+        # self.__build_numerical_pairplot(data_state)
         return
 
     def __build_numerical_correlation_matrix(self, data_state:str):
@@ -181,8 +183,8 @@ class DataAnalysis:
         vars = self.data.select_dtypes('number')
         for var in vars:
             plt.subplots()
-            # sns.boxplot(data=self.data, x=var, palette="tab10")
-            sns.boxenplot(data=self.data, x=var, palette="tab10")
+            sns.boxplot(data=self.data, x=var,  palette="tab10")
+            # sns.boxenplot(data=self.data, x=var, palette="tab10")
             plt.savefig('{}/{}_boxenplot_{}.png'.format(final_output_dir, data_state, var), bbox_inches='tight')
             plt.close()
 
@@ -210,7 +212,11 @@ class DataAnalysis:
         g = sns.PairGrid(self.data, vars=vars, hue="category", palette="viridis", dropna=True)
         g.map_diag(sns.kdeplot)
         g.map_offdiag(sns.scatterplot, size=self.data["state"])
-        # g.add_legend(title="", adjust_subtitles=True)
+
+        # Prevents a bug when only a single variable is present...
+        if (len(vars) > 1):
+            g.add_legend(title="", adjust_subtitles=True)
+
         g.savefig('{}/{}_pairgrid.png'.format(final_output_dir, data_state))
         return
 
@@ -220,6 +226,7 @@ class DataAnalysis:
         """
 
         self.__build_categorial_countplots(data_state)
+        self.__build_categorial_catplots(data_state)
 
         num_vars = [
             'age',
@@ -252,20 +259,6 @@ class DataAnalysis:
         print('  end_date: ', self.data.loc[(self.data.end_date == datetime.fromtimestamp(0)), 'end_date'].size)
         print('  end_date: ', self.data.loc[:, 'end_date'].min())
         print('  end_date: ', self.data.loc[:, 'end_date'].max())
-
-        sns.catplot(y='country',
-            hue=None, col="currency",
-            data=self.data, kind="count",
-            height=4, aspect=.7, col_wrap=4, sharex=False)
-        plt.savefig(self.output_dir + '/grid_countplot_{}-{}.png'.format('country', 'currency'), bbox_inches='tight')
-        plt.close()
-        
-        sns.catplot(y='currency',
-            hue=None, col="country",
-            data=self.data, kind="count",
-            height=4, aspect=.7, col_wrap=4, sharex=False)
-        plt.savefig(self.output_dir + '/grid_countplot_{}-{}.png'.format('currency', 'country'), bbox_inches='tight')
-        plt.close()
         return
 
     def __build_categorial_countplots(self, data_state:str):
@@ -293,4 +286,81 @@ class DataAnalysis:
                 ax.bar_label(container)
             plt.savefig('{}/{}_countplot_{}.png'.format(final_output_dir, data_state, var), bbox_inches='tight')
             plt.close()
+        return
+        
+    def __build_categorial_catplots(self, data_state:str):
+        """
+        Export pairplots
+        """
+
+        # Create any missing directories in the output path
+        final_output_dir = '{}/{}/multivariate'.format(self.output_dir, data_state)
+        if not os.path.isdir(final_output_dir):
+            os.makedirs(final_output_dir)
+
+        col_vars = [
+            'state',
+            'sex',
+            # 'country',
+        ]
+        y_vars = [
+            'name',
+            'category',
+            'subcategory',
+            'country',
+            'sex',
+            # 'currency',
+            'state',
+        ]
+        for col in col_vars:
+            for y in y_vars:
+                if (y == col):
+                    continue
+
+                g:FacetGrid = sns.catplot(
+                    y=y, hue=None, col=col, data=self.data,
+                    kind="count",
+                    order=self.data[y].value_counts(ascending=False, sort=True).iloc[:20].index,
+                    # order=self.data[var].value_counts().index,
+                    col_wrap=3)
+
+                for ax in g.axes:
+                    ax.bar_label(ax.containers[0])
+                g.tight_layout()
+                g.savefig('{}/{}_catplots-{}-{}.png'.format(final_output_dir, data_state, col, y))
+                plt.close()
+
+        x = 'age'
+        for y in y_vars:
+            ax = sns.boxplot(
+                x=x, y=y, data=self.data,
+                order=self.data[y].value_counts(ascending=False, sort=True).iloc[:20].index,
+                orient="h")
+            plt.tight_layout()
+            plt.savefig('{}/{}_catplots-{}-{}.png'.format(final_output_dir, data_state, x, y))
+            plt.close()
+
+        x = 'duration_days'
+        if (x in self.data.columns):
+            for y in y_vars:
+                ax = sns.boxplot(
+                    x=x, y=y, data=self.data,
+                    order=self.data[y].value_counts(ascending=False, sort=True).iloc[:20].index,
+                    orient="h")
+                plt.tight_layout()
+                plt.savefig('{}/{}_catplots-{}-{}.png'.format(final_output_dir, data_state, x, y))
+                plt.close()
+
+        x = 'log_goal'
+        if (x in self.data.columns):
+            for y in y_vars:
+                ax = sns.boxplot(
+                    x=x, y=y, data=self.data,
+                    order=self.data[y].value_counts(ascending=False, sort=True).iloc[:20].index,
+                    orient="h")
+
+                ax.set_xscale('linear')
+                plt.tight_layout()
+                plt.savefig('{}/{}_catplots-{}-{}.png'.format(final_output_dir, data_state, x, y))
+                plt.close()
         return
