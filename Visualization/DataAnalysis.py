@@ -100,6 +100,33 @@ class DataAnalysis:
         pd.reset_option('display.max_colwidth')
         pd.reset_option('display.float_format')
 
+    def clean_data(self):
+        self.data = self.data.drop(self.data[self.data.state.str.upper().isin(["LIVE", "SUSPENDED", "UNDEFINED"])].index)
+        self.data.state = self.data.state.replace("CANCELED", "FAILED")
+
+        self.data['usd_goal'] = self.data.apply(lambda row: self.cc.convert(row.goal, row.currency, 'USD'), axis=1)
+
+        self.data['log_goal'] = np.log10(self.data['goal'].replace(0, 0.1))
+        
+        print(self.data.loc[self.data.country.isin([None]), 'country'].size)
+        self.data.country.fillna(self.data.currency.apply(lambda c: c[:2] if c != 'EUR' else None), inplace=True)
+        print(self.data.loc[self.data.country.isin([None]), 'country'].size)
+        self.data.country.fillna('UNK', inplace=True)
+        self.data.sex.fillna('UNK', inplace=True)
+        # self.data.dropna(subset=['sex'], inplace=True) # Could try simply dropping missing values (<2% of instances)
+
+        self.data = self.data.drop(self.data[(self.data.start_date == datetime.fromtimestamp(0)) | (self.data.end_date == datetime.fromtimestamp(0))].index)
+        self.data['duration_days'] = self.data.apply(lambda row: (row.end_date - row.start_date).days, axis=1)
+        return
+
+    def sample_data(self):
+        min_occurences = min(self.data.groupby(['state']).size().reset_index(drop=True))
+        print(f"min_occurences = {min_occurences}")
+        self.data = pd.concat([
+            self.data[self.data.state.isin([col])].sample(min_occurences) for col in ["FAILED", "SUCCESSFUL"]
+        ])
+        return
+
     def __preprocess(self):
         """
         Normalize types
@@ -118,136 +145,95 @@ class DataAnalysis:
             self.data.loc[(self.data[label] == ''), label] = None
             self.data[label].replace('\s+', ' ', regex=True, inplace=True)
 
-    def __build_numerical_boxplots(self):
-        """
-        Export boxplots
-        """
-
-        vars = [
-            'age',
-            'goal',
-            'usd_goal',
-            'pledged',
-            'usd_pledged',
-            'backers',
-            'elapsed_days',
-        ]
-        for var in vars:
-            plt.subplots()
-            # sns.boxplot(data=self.data, x=var, palette="tab10")
-            sns.boxenplot(data=self.data, x=var, palette="tab10")
-            plt.savefig(self.output_dir + '/num_boxenplot_{}.png'.format(var), bbox_inches='tight')
-            plt.close()
-
-    def __build_numerical_pairplot(self):
-        """
-        Export pairplots
-        """
-
-        vars = [
-            'age',
-            'log_goal',
-            'log_pledged',
-            'log_backers',
-            'elapsed_days',
-        ]
-
-        g = sns.PairGrid(self.data, vars=vars, hue="category", palette="viridis", dropna=True)
-        g.map_diag(sns.kdeplot)
-        g.map_offdiag(sns.scatterplot, size=self.data["state"])
-        g.add_legend(title="", adjust_subtitles=True)
-        g.savefig(self.output_dir + '/num_pairgrid.png')
-        return
-
-    def build_plots_numerical(self):
+    def build_plots_numerical(self, data_state:str):
         """
         Export correlation matrix
         """
 
-        corr=self.data.corr()
-        plt.subplots(figsize=(16,9))
-        heatmap=sns.heatmap(corr,
-                            xticklabels=corr.columns,
-                            yticklabels=corr.columns)
-        plt.tight_layout()
-        plt.savefig(self.output_dir + '/correlation-matrix.png', bbox_inches='tight')
-
-        self.__build_numerical_boxplots()
-        self.__build_numerical_pairplot()
+        self.__build_numerical_correlation_matrix(data_state)
+        self.__build_numerical_boxplots(data_state)
+        self.__build_numerical_pairplot(data_state)
         return
 
-    def build_plots_categorial(self):
+    def __build_numerical_correlation_matrix(self, data_state:str):
+        # Create any missing directories in the output path
+        final_output_dir = '{}/{}/numerical'.format(self.output_dir, data_state)
+        if not os.path.isdir(final_output_dir):
+            os.makedirs(final_output_dir)
+
+        corr=self.data.corr()
+        plt.subplots(figsize=(16,9))
+        heatmap=sns.heatmap(corr, vmin=-1, vmax=1,
+                            annot=True)
+        plt.tight_layout()
+        plt.savefig('{}/{}_correlation-matrix.png'.format(final_output_dir, data_state), bbox_inches='tight')
+
+    def __build_numerical_boxplots(self, data_state:str):
+        """
+        Export boxplots
+        """
+
+        # Create any missing directories in the output path
+        final_output_dir = '{}/{}/numerical'.format(self.output_dir, data_state)
+        if not os.path.isdir(final_output_dir):
+            os.makedirs(final_output_dir)
+
+        vars = self.data.select_dtypes('number')
+        for var in vars:
+            plt.subplots()
+            # sns.boxplot(data=self.data, x=var, palette="tab10")
+            sns.boxenplot(data=self.data, x=var, palette="tab10")
+            plt.savefig('{}/{}_boxenplot_{}.png'.format(final_output_dir, data_state, var), bbox_inches='tight')
+            plt.close()
+
+    def __build_numerical_pairplot(self, data_state:str):
+        """
+        Export pairplots
+        """
+
+        # Create any missing directories in the output path
+        final_output_dir = '{}/{}/multivariate'.format(self.output_dir, data_state)
+        if not os.path.isdir(final_output_dir):
+            os.makedirs(final_output_dir)
+
+        # vars = self.data.select_dtypes('number')
+        vars = [
+            'age',
+        ]
+
+        if ('duration_days' in self.data.columns):
+            vars.append('duration_days')
+
+        if ('log_goal' in self.data.columns):
+            vars.append('log_goal')
+
+        g = sns.PairGrid(self.data, vars=vars, hue="category", palette="viridis", dropna=True)
+        g.map_diag(sns.kdeplot)
+        g.map_offdiag(sns.scatterplot, size=self.data["state"])
+        # g.add_legend(title="", adjust_subtitles=True)
+        g.savefig('{}/{}_pairgrid.png'.format(final_output_dir, data_state))
+        return
+
+    def build_plots_categorial(self, data_state:str):
         """
         Export categorical plots
         """
 
-        # Before removing useless classes
-        vars = [
-            'category',
-            'country',
-            'sex',
-            'currency',
-            'state',
-        ]
-        for var in vars:
-            plt.subplots()
-            sns.countplot(data=self.data, y=var, palette="crest")
-            plt.savefig(self.output_dir + '/before_cat_catplot_{}.png'.format(var), bbox_inches='tight')
-            plt.close()
-
-        # Remove useless states and merge others
-        self.data = self.data.drop(self.data[self.data.state.str.upper().isin(["LIVE", "SUSPENDED", "UNDEFINED"])].index)
-        self.data.state = self.data.state.replace("CANCELED", "FAILED")
-        print("> Remove useless states and merge others - DONE!")
-
-        # After removing useless classes
-        vars = [
-            'category',
-            'country',
-            'sex',
-            'currency',
-            'state',
-        ]
-        for var in vars:
-            plt.subplots()
-            sns.countplot(data=self.data, y=var, palette="crest")
-            plt.savefig(self.output_dir + '/after_cleaning_cat_catplot_{}.png'.format(var), bbox_inches='tight')
-            plt.close()
-        
-        # Downsampling the data
-        min_occurences = min(self.data.groupby(['state']).size().reset_index(drop=True))
-        print(f"min_occurences = {min_occurences}")
-        self.data = pd.concat([
-            self.data[self.data.state.isin([col])].sample(min_occurences) for col in ["FAILED", "SUCCESSFUL"]
-        ])
-        
-        # After downsampling
-        vars = [
-            'category',
-            'country',
-            'sex',
-            'currency',
-            'state',
-        ]
-        for var in vars:
-            plt.subplots()
-            sns.countplot(data=self.data, y=var, palette="crest")
-            plt.savefig(self.output_dir + '/after_downsampling_cat_catplot_{}.png'.format(var), bbox_inches='tight')
-            plt.close()
+        self.__build_categorial_countplots(data_state)
 
         num_vars = [
             'age',
             'goal',
             'usd_goal',
             'usd_pledged',
-            'elapsed_days',
+            'duration_days',
         ]
         num_vars_log = [
             'age',
             'log_goal',
             'log_goal',
             'log_pledged',
-            'elapsed_days',
+            'duration_days',
         ]
         # sns.catplot(x=var,
         #     hue="state", col="category",
@@ -259,12 +245,6 @@ class DataAnalysis:
         #     height=4, aspect=.7, col_wrap=4)
         # plt.savefig('plots/grid_scatter_cagtegory-{}.png'.format('test'), bbox_inches='tight')
         # plt.close()
-        print(self.data.loc[self.data.country.isin([None]), 'country'].size)
-        self.data.country.fillna(self.data.currency.apply(lambda c: c[:2] if c != 'EUR' else None), inplace=True)
-        print(self.data.loc[self.data.country.isin([None]), 'country'].size)
-        self.data.country.fillna('UNK', inplace=True)
-
-# self.data = self.data.drop(self.data[(self.data.start_date == datetime.fromtimestamp(0)) | (self.data.end_date == datetime.fromtimestamp(0))].index)
 
         print('start_date: ', self.data.loc[(self.data.start_date == datetime.fromtimestamp(0)), 'start_date'].size)
         print('  end_date: ', self.data.loc[:, 'start_date'].min())
@@ -286,5 +266,31 @@ class DataAnalysis:
             height=4, aspect=.7, col_wrap=4, sharex=False)
         plt.savefig(self.output_dir + '/grid_countplot_{}-{}.png'.format('currency', 'country'), bbox_inches='tight')
         plt.close()
+        return
 
+    def __build_categorial_countplots(self, data_state:str):
+        """
+        Export categorical plots
+        """
+
+        # Create any missing directories in the output path
+        final_output_dir = '{}/{}/categorical'.format(self.output_dir, data_state)
+        if not os.path.isdir(final_output_dir):
+            os.makedirs(final_output_dir)
+
+        # Before removing useless classes
+        vars = [
+            'category',
+            'country',
+            'sex',
+            'currency',
+            'state',
+        ]
+        for var in vars:
+            plt.subplots()
+            ax = sns.countplot(data=self.data, y=var, palette="crest", order=self.data[var].value_counts().index)
+            for container in ax.containers:
+                ax.bar_label(container)
+            plt.savefig('{}/{}_countplot_{}.png'.format(final_output_dir, data_state, var), bbox_inches='tight')
+            plt.close()
         return
