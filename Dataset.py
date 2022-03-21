@@ -163,7 +163,8 @@ class Dataset:
             print("> Get elapsed time in days - DONE!")
 
             # Remove elements with more than 365 days
-            df = df[df['duration_days'] <= 365]
+            # df = df[df['duration_days'] <= 365]
+            self.data = self.data.drop(self.data[(self.data.start_date == datetime.fromtimestamp(0)) | (self.data.end_date == datetime.fromtimestamp(0))].index)
             print("> Remove extrema for the elapsed time in days - DONE!")
 
             # Normalize Currency
