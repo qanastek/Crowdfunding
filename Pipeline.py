@@ -73,9 +73,23 @@ class Pipeline:
             data = DataAnalysis(DataAnalysis.DATA_PROJECTS_FILE_H5)
 
             print("\n\n" + "#"*78 + "\n" + " "*34 + "[ANALYSIS]\n" + "#"*78)
+
             data.print_statistics()
-            # data.build_plots_numerical()
-            data.build_plots_categorial()
+            data.build_plots_numerical('raw_data')
+            data.build_plots_categorial('raw_data')
+
+            data.clean_data()
+            
+            data.print_statistics()
+            data.build_plots_numerical('clean_data')
+            data.build_plots_categorial('clean_data')
+
+            # Downsampling the data
+            data.sample_data()
+            
+            data.print_statistics()
+            data.build_plots_numerical('sampled_data')
+            data.build_plots_categorial('sampled_data')
 
         run()
 
