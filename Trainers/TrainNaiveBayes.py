@@ -30,6 +30,21 @@ class TrainNaiveBayes(Trainer):
                 clean_gzip=False,
             ),
             "args": [
+                {"var_smoothing":1e-1},
+                {"var_smoothing":1e-2},
+                {"var_smoothing":1e-3},
+                {"var_smoothing":1e-4},
+                {"var_smoothing":1e-5},
+                {"var_smoothing":1e-6},
+                {"var_smoothing":1e-7},
+                {"var_smoothing":1e-8},
+                
                 {"var_smoothing":1e-9},
+                
+                {"var_smoothing":1e-10},
+                {"var_smoothing":1e-11},
+                {"var_smoothing":1e-12},
+                {"var_smoothing":1e-13},
+                {"var_smoothing":1e-14},
             ]
         }

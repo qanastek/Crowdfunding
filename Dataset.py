@@ -238,7 +238,7 @@ class Dataset:
             self.x_train, self.y_train = self.__transform(df_train, mode="train")
             self.x_dev, self.y_dev     = self.__transform(df_dev, mode="dev")
             self.x_test, self.y_test   = self.__transform(df_test, mode="test")
-            
+
             # Save sub-dataframes
             if self.save_gzip_path != None:
 

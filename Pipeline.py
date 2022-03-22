@@ -29,10 +29,10 @@ class Pipeline:
         # Models to run benchmarks
         self.models : List[Trainer] = [
             # TrainNaiveBayes,
-            TrainDecisionTree,
+            # TrainDecisionTree,
             # TrainSVM,
             # TrainMLP,
-            # TrainKNN,
+            TrainKNN,
         ]
 
         self.score_metric = "accuracy_score"

@@ -7,7 +7,11 @@
         \rowcolor{fgLightRed}
         \hline
         \textbf{Model} & \textbf{Taux d'erreur} & \textbf{Précision} & \textbf{Rappel} & \textbf{F1\_Score} \\ \hline
-	DecisionTree & 95.00 \% & 95.00 \% & 95.00 \% & 95.00 \% \\ 
+	DecisionTree & 95.00 \% & 95.00 \% & 95.00 \% & 95.00 \% \\
+	NaiveBayes & 62.00 \% & 64.00 \% & 62.00 \% & 60.00 \% \\
+	SVM & 65.00 \% & 65.00 \% & 65.00 \% & 65.00 \% \\
+	MLP & 75.00 \% & 75.00 \% & 75.00 \% & 75.00 \% \\
+	KNN & 95.00 \% & 95.00 \% & 95.00 \% & 95.00 \% \\ 
         \hline\end{tabular}
         % }
         \caption{Résultats train.}
