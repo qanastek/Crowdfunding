@@ -84,8 +84,7 @@ class Pipeline:
             data.build_plots_numerical('clean_data')
             data.build_plots_categorial('clean_data')
 
-            # Downsampling the data
-            data.sample_data()
+            data.sample_data() # Downsampling the data
             
             data.print_statistics()
             data.build_plots_numerical('sampled_data')
