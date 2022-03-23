@@ -1,8 +1,9 @@
-pandas
+pandas>=1.4.1
+matplotlib>=3.4
+sklearn
 seaborn
 tables
 tqdm
-sklearn
 requests
 CurrencyConverter
 tensorflow
