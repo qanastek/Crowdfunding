@@ -7,4 +7,3 @@ tqdm
 requests
 CurrencyConverter
 tensorflow
-lux-api
