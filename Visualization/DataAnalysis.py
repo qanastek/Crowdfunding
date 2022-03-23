@@ -1,5 +1,6 @@
 import os
 import sys
+import matplotlib
 from matplotlib.axis import Axis
 import requests
 import seaborn as sns
@@ -97,6 +98,13 @@ class DataAnalysis:
         print(self.data.describe().transpose())
         print()
         print(self.data.select_dtypes(object).describe().transpose())
+        if ('duration_days' in self.data.columns):
+            print()
+            print(self.data.groupby(by=['country'])['usd_goal'].sum().sort_values(ascending=False))
+            print()
+            print(self.data.groupby(by=['country'])['usd_goal'].describe().unstack(1).transpose())
+            print()
+            print(self.data[self.data.state.isin(['SUCCESSFUL'])].groupby(by=['country'])['id'].count())
 
         pd.reset_option('display.max_rows')
         pd.reset_option('display.max_colwidth')
@@ -108,7 +116,7 @@ class DataAnalysis:
 
         self.data['usd_goal'] = self.data.apply(lambda row: self.cc.convert(row.goal, row.currency, 'USD'), axis=1)
 
-        self.data['log_goal'] = np.log10(self.data['goal'].replace(0, 0.1))
+        self.data['log_goal'] = np.log10(self.data['usd_goal'].replace(0, 0.1))
         
         print(self.data.loc[self.data.country.isin([None]), 'country'].size)
         self.data.country.fillna(self.data.currency.apply(lambda c: c[:2] if c != 'EUR' else None), inplace=True)
@@ -164,11 +172,10 @@ class DataAnalysis:
             os.makedirs(final_output_dir)
 
         corr=self.data.corr()
-        plt.subplots(figsize=(16,9))
-        heatmap=sns.heatmap(corr, vmin=-1, vmax=1,
-                            annot=True)
+        sns.heatmap(corr, vmin=-1, vmax=1, annot=True)
         plt.tight_layout()
         plt.savefig('{}/{}_correlation-matrix.png'.format(final_output_dir, data_state), bbox_inches='tight')
+        plt.close()
 
     def __build_numerical_boxplots(self, data_state:str):
         """
@@ -180,13 +187,40 @@ class DataAnalysis:
         if not os.path.isdir(final_output_dir):
             os.makedirs(final_output_dir)
 
-        vars = self.data.select_dtypes('number')
-        for var in vars:
-            plt.subplots()
-            sns.boxplot(data=self.data, x=var,  palette="tab10")
-            # sns.boxenplot(data=self.data, x=var, palette="tab10")
-            plt.savefig('{}/{}_boxenplot_{}.png'.format(final_output_dir, data_state, var), bbox_inches='tight')
+        vars = [
+            'age'
+        ]
+        bins = [
+            np.arange(10, 80, 2)
+        ]
+
+        if ('duration_days' in self.data.columns):
+            vars.append('duration_days')
+            bins.append(np.arange(0, 100, 5))
+
+        if ('log_goal' in self.data.columns):
+            vars.append('log_goal')
+            bins.append(np.arange(-4, 10, 0.25))
+
+        for var, b in zip(vars, bins):
+            f, (ax_box, ax_hist) = plt.subplots(2, sharex=True, gridspec_kw={"height_ratios": (.15, .85)})
+            sns.boxplot(data=self.data, x=var, ax=ax_box)
+            sns.histplot(data=self.data, x=var, ax=ax_hist, bins=b, edgecolor="black")
+            ax_box.set(xlabel='')
+            plt.savefig('{}/{}_jointplot_{}.png'.format(final_output_dir, data_state, var), bbox_inches='tight')
             plt.close()
+
+        # var = 'age'
+
+        # # creating a figure composed of two matplotlib.Axes objects (ax_box and ax_hist)
+        # f, (ax_box, ax_hist) = plt.subplots(2, sharex=True, gridspec_kw={"height_ratios": (.15, .85)})
+
+        # bins = np.arange(10, 80, 2)
+        # sns.boxplot(self.data[var], x=var, ax=ax_box)
+        # sns.histplot(data=self.data, x=var, ax=ax_hist, bins=bins, edgecolor="black")
+        # ax_box.set(xlabel='')
+        # plt.savefig('{}/{}_jointplot_{}.png'.format(final_output_dir, data_state, var), bbox_inches='tight')
+        # plt.close()
 
     def __build_numerical_pairplot(self, data_state:str):
         """
@@ -209,15 +243,17 @@ class DataAnalysis:
         if ('log_goal' in self.data.columns):
             vars.append('log_goal')
 
-        g = sns.PairGrid(self.data, vars=vars, hue="category", palette="viridis", dropna=True)
+        g:sns.PairGrid = sns.PairGrid(self.data, vars=vars, hue="state", palette="tab10", diag_sharey=False)
         g.map_diag(sns.kdeplot)
-        g.map_offdiag(sns.scatterplot, size=self.data["state"])
+        # g.map_offdiag(sns.scatterplot, size=self.data["state"])
+        g.map_offdiag(sns.kdeplot, alpha=0.6)
 
         # Prevents a bug when only a single variable is present...
         if (len(vars) > 1):
             g.add_legend(title="", adjust_subtitles=True)
 
         g.savefig('{}/{}_pairgrid.png'.format(final_output_dir, data_state))
+        plt.close()
         return
 
     def build_plots_categorial(self, data_state:str):
@@ -227,31 +263,6 @@ class DataAnalysis:
 
         self.__build_categorial_countplots(data_state)
         self.__build_categorial_catplots(data_state)
-
-        num_vars = [
-            'age',
-            'goal',
-            'usd_goal',
-            'usd_pledged',
-            'duration_days',
-        ]
-        num_vars_log = [
-            'age',
-            'log_goal',
-            'log_goal',
-            'log_pledged',
-            'duration_days',
-        ]
-        # sns.catplot(x=var,
-        #     hue="state", col="category",
-        #     data=self.data, kind="count",
-        #     height=4, aspect=.7, col_wrap=4)
-        # sns.catplot(y='country', x='age',
-        #     hue="state", col="category",
-        #     data=self.data.sample(1000),
-        #     height=4, aspect=.7, col_wrap=4)
-        # plt.savefig('plots/grid_scatter_cagtegory-{}.png'.format('test'), bbox_inches='tight')
-        # plt.close()
 
         print('start_date: ', self.data.loc[(self.data.start_date == datetime.fromtimestamp(0)), 'start_date'].size)
         print('  end_date: ', self.data.loc[:, 'start_date'].min())
@@ -301,7 +312,7 @@ class DataAnalysis:
         col_vars = [
             'state',
             'sex',
-            # 'country',
+            'country',
         ]
         y_vars = [
             'name',
@@ -309,14 +320,14 @@ class DataAnalysis:
             'subcategory',
             'country',
             'sex',
-            # 'currency',
             'state',
         ]
         for col in col_vars:
             for y in y_vars:
                 if (y == col):
                     continue
-
+                
+                print('[{}-{}]'.format(col, y))
                 g:FacetGrid = sns.catplot(
                     y=y, hue=None, col=col, data=self.data,
                     kind="count",
