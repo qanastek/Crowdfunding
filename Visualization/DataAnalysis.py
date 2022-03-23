@@ -197,7 +197,7 @@ class DataAnalysis:
 
         if ('duration_days' in self.data.columns):
             vars.append('duration_days')
-            bins.append(np.arange(0, 100, 5))
+            bins.append(np.arange(0, 100, 1))
 
         if ('log_goal' in self.data.columns):
             vars.append('log_goal')
@@ -286,6 +286,7 @@ class DataAnalysis:
         # Before removing useless classes
         vars = [
             'category',
+            'subcategory',
             'country',
             'sex',
             'currency',
@@ -293,7 +294,7 @@ class DataAnalysis:
         ]
         for var in vars:
             plt.subplots()
-            ax = sns.countplot(data=self.data, y=var, palette="crest", order=self.data[var].value_counts().index)
+            ax = sns.countplot(data=self.data, y=var, palette="crest", order=self.data[var].value_counts()[:20].index)
             for container in ax.containers:
                 ax.bar_label(container)
             plt.savefig('{}/{}_countplot_{}.png'.format(final_output_dir, data_state, var), bbox_inches='tight')
