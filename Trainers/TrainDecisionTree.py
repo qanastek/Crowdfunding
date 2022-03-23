@@ -17,11 +17,6 @@ class TrainDecisionTree(Trainer):
             max_depth=depth,
             criterion=criterion,
         )
-        # self.model = RandomForestClassifier(
-        #     max_depth=depth,
-        #     criterion=criterion,
-        #     n_jobs=-1
-        # )
 
         self.model.fit(self.ds.x_train, self.ds.y_train)
 
