@@ -24,7 +24,7 @@ class Pipeline:
     Run the benchmarks
     """
 
-    def __init__(self, dir="benchmarks/"):
+    def __init__(self, dir="benchmarks/", with_visualization=False):
 
         # Models to run benchmarks
         self.models : List[Trainer] = [
@@ -60,14 +60,17 @@ class Pipeline:
         self.output_path_train = base + ".train.json"
 
         # Run the visualization in a background thread
-        self.dataVisualization()
+        self.dataVisualization(with_visualization)
 
-    def dataVisualization(self):
+    def dataVisualization(self, with_visualization):
         """
         Run the visualization in a background thread
         """
 
-        def run():
+        def run(with_visualization):
+
+            if with_visualization == False:
+                return
 
             print("\n" + "#"*78 + "\n" + " "*34 + "[DATASET]\n" + "#"*78)
             data = DataAnalysis(DataAnalysis.DATA_PROJECTS_FILE_H5)
@@ -90,7 +93,7 @@ class Pipeline:
             data.build_plots_numerical('sampled_data')
             data.build_plots_categorial('sampled_data')
 
-        run()
+        run(with_visualization)
 
     def loadModel(self, model_path):
         with open(model_path, 'rb') as f:
@@ -240,7 +243,7 @@ class Pipeline:
 
             print(f"> Saved at : \033[96m{best_config['model_path']}\033[0m")
 
-p = Pipeline()
+p = Pipeline(with_visualization=False)
 p.gridSearch()
 p.findBest()
 ResultsToLatex(input_dir="./benchmarks", save_dir="./Visualization/")

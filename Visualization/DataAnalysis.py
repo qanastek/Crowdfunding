@@ -155,14 +155,15 @@ class DataAnalysis:
             self.data.loc[(self.data[label] == ''), label] = None
             self.data[label].replace('\s+', ' ', regex=True, inplace=True)
 
-    def build_plots_numerical(self, data_state:str):
+    def build_plots_numerical(self, data_state:str, with_pair_grid=False):
         """
         Export correlation matrix
         """
 
         self.__build_numerical_correlation_matrix(data_state)
         self.__build_numerical_boxplots(data_state)
-        # self.__build_numerical_pairplot(data_state)
+        if with_pair_grid:
+            self.__build_numerical_pairplot(data_state)
         return
 
     def __build_numerical_correlation_matrix(self, data_state:str):
