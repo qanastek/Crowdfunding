@@ -117,6 +117,11 @@ class Dataset:
         if self.normalizer != None and scaler != None:
             sub_df[self.numeric_features] = scaler.fit_transform(sub_df[self.numeric_features])
 
+        # Collect features
+        self.feature_names = list(sub_df.columns)
+        features_output = open(self.features_path,"w")
+        features_output.write("\n".join(self.feature_names))
+        
         # Transform to numpy array
         X = sub_df.to_numpy()
         print("> Converted to NumPy array - DONE!\n")
@@ -230,11 +235,6 @@ class Dataset:
 
             # Split into train and test
             length = len(df)
-
-            # Collect features
-            self.feature_names = list(df.columns)
-            features_output = open(self.features_path,"w")
-            features_output.write("\n".join(self.feature_names))
 
             # Index and split for train
             train_start_idx, train_end_idx = 0, int(length*self.train_ratio)

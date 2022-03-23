@@ -197,6 +197,7 @@ class Pipeline:
         y = dataset.y_test
         labels = dataset.labels
         feature_names = dataset.feature_names
+        # feature_names = [d for d in dataset.feature_names if d not in ['id', 'name', 'pledged', 'backers', 'state', 'start_date', 'end_date']]
         
         # For each architecture
         for arch in self.models:
@@ -227,7 +228,7 @@ class Pipeline:
 
             if name == "DecisionTree":
 
-                fig = plt.figure(num=None, figsize=(10, 8), dpi=300)
+                fig = plt.figure(num=None, figsize=(25, 25), dpi=300)
                 tree.plot_tree(
                     best_model,
                     feature_names=feature_names,  
