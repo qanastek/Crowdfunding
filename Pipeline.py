@@ -5,6 +5,9 @@ import pickle
 from typing import List
 from datetime import datetime
 
+import matplotlib.pyplot as plt
+
+from sklearn import tree
 from sklearn.metrics import classification_report, accuracy_score
 
 from Trainers.Trainer import Trainer
@@ -28,8 +31,8 @@ class Pipeline:
 
         # Models to run benchmarks
         self.models : List[Trainer] = [
-            TrainNaiveBayes,
-            # TrainDecisionTree,
+            # TrainNaiveBayes,
+            TrainDecisionTree,
             # TrainSVM,
             # TrainMLP,
             # TrainKNN,
@@ -58,6 +61,7 @@ class Pipeline:
         base = self.directory + "benchmark-" + self.date_str
         self.output_path = base + ".json"
         self.output_path_train = base + ".train.json"
+        self.output_decision_tree = self.directory + "decision_tree.png"
 
         # Run the visualization in a background thread
         self.dataVisualization(with_visualization, with_pair_grid)
@@ -192,6 +196,7 @@ class Pipeline:
         x = dataset.x_test
         y = dataset.y_test
         labels = dataset.labels
+        feature_names = dataset.feature_names
         
         # For each architecture
         for arch in self.models:
@@ -219,6 +224,19 @@ class Pipeline:
             # Load best model and perform predictions on the test set
             best_model = self.loadModel(best_config["model_path"])
             preds = best_model.predict(x)
+
+            if name == "DecisionTree":
+
+                fig = plt.figure(num=None, figsize=(10, 8), dpi=300)
+                tree.plot_tree(
+                    best_model,
+                    feature_names=feature_names,  
+                    class_names=labels,  
+                    filled=True,
+                    rounded=True
+                )
+                plt.savefig(self.output_decision_tree)
+                plt.close(fig)
 
             # Evaluate Accuracy
             acc = accuracy_score(y_true=y, y_pred=preds)

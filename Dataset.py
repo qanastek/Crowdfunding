@@ -75,6 +75,11 @@ class Dataset:
         # Define regex parse for date
         self.dateparse = lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S')
 
+        # Full Features
+        self.feature_names = []
+        self.features_path = "data/features.txt"
+
+        # Original Features
         self.numeric_features = ["age", "goal", "duration_days"]
         self.categorical_features = ["category", "subcategory", "country", "sex"]
 
@@ -136,6 +141,9 @@ class Dataset:
             self.labels = self.label_encoder.classes_
             print("> Labels loaded from cache - DONE!", self.labels)
 
+            self.feature_names = open(self.features_path,"r").read().split("\n")
+            print("> Labels features from cache - DONE!")
+
         else:
 
             # Read original CSV file
@@ -164,7 +172,7 @@ class Dataset:
 
             # Remove elements with more than 365 days
             # df = df[df['duration_days'] <= 365]
-            self.data = self.data.drop(self.data[(self.data.start_date == datetime.fromtimestamp(0)) | (self.data.end_date == datetime.fromtimestamp(0))].index)
+            df = df.drop(df[(df.start_date == datetime.fromtimestamp(0)) | (df.end_date == datetime.fromtimestamp(0))].index)
             print("> Remove extrema for the elapsed time in days - DONE!")
 
             # Normalize Currency
@@ -222,6 +230,11 @@ class Dataset:
 
             # Split into train and test
             length = len(df)
+
+            # Collect features
+            self.feature_names = list(df.columns)
+            features_output = open(self.features_path,"w")
+            features_output.write("\n".join(self.feature_names))
 
             # Index and split for train
             train_start_idx, train_end_idx = 0, int(length*self.train_ratio)
