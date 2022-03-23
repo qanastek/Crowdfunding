@@ -24,7 +24,7 @@ class Pipeline:
     Run the benchmarks
     """
 
-    def __init__(self, dir="benchmarks/", with_visualization=False):
+    def __init__(self, dir="benchmarks/", with_visualization=False, with_pair_grid=False):
 
         # Models to run benchmarks
         self.models : List[Trainer] = [
@@ -60,9 +60,9 @@ class Pipeline:
         self.output_path_train = base + ".train.json"
 
         # Run the visualization in a background thread
-        self.dataVisualization(with_visualization)
+        self.dataVisualization(with_visualization, with_pair_grid)
 
-    def dataVisualization(self, with_visualization=False, with_pair_grid=False):
+    def dataVisualization(self, with_visualization, with_pair_grid):
         """
         Run the visualization in a background thread
         """
