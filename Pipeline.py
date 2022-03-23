@@ -62,12 +62,12 @@ class Pipeline:
         # Run the visualization in a background thread
         self.dataVisualization(with_visualization)
 
-    def dataVisualization(self, with_visualization):
+    def dataVisualization(self, with_visualization=False, with_pair_grid=False):
         """
         Run the visualization in a background thread
         """
 
-        def run(with_visualization):
+        def run(with_visualization, with_pair_grid):
 
             if with_visualization == False:
                 return
@@ -78,22 +78,22 @@ class Pipeline:
             print("\n\n" + "#"*78 + "\n" + " "*34 + "[ANALYSIS]\n" + "#"*78)
 
             data.print_statistics()
-            data.build_plots_numerical('raw_data')
+            data.build_plots_numerical('raw_data',with_pair_grid)
             data.build_plots_categorial('raw_data')
 
             data.clean_data()
             
             data.print_statistics()
-            data.build_plots_numerical('clean_data')
+            data.build_plots_numerical('clean_data',with_pair_grid)
             data.build_plots_categorial('clean_data')
 
             data.sample_data() # Downsampling the data
             
             data.print_statistics()
-            data.build_plots_numerical('sampled_data')
+            data.build_plots_numerical('sampled_data',with_pair_grid)
             data.build_plots_categorial('sampled_data')
 
-        run(with_visualization)
+        run(with_visualization, with_pair_grid)
 
     def loadModel(self, model_path):
         with open(model_path, 'rb') as f:
@@ -243,7 +243,7 @@ class Pipeline:
 
             print(f"> Saved at : \033[96m{best_config['model_path']}\033[0m")
 
-p = Pipeline(with_visualization=False)
+p = Pipeline(with_visualization=False, with_pair_grid=False)
 p.gridSearch()
 p.findBest()
 ResultsToLatex(input_dir="./benchmarks", save_dir="./Visualization/")
