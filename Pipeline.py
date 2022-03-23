@@ -262,7 +262,7 @@ class Pipeline:
 
             print(f"> Saved at : \033[96m{best_config['model_path']}\033[0m")
 
-p = Pipeline(with_visualization=False, with_pair_grid=False)
+p = Pipeline(with_visualization=True, with_pair_grid=False)
 p.gridSearch()
 p.findBest()
 ResultsToLatex(input_dir="./benchmarks", save_dir="./Visualization/")
